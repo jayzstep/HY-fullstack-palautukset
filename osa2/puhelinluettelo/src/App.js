@@ -1,13 +1,49 @@
 import { useState } from 'react'
 
-
-const Numbers = ({ persons, filterInput }) => {
-  const personList = persons.map(person => <p key={person.name}>{person.name} {person.number}</p>)
-  const filteredPersonList = persons.filter(person => person.name.startsWith(filterInput)).map(person => <p key={person.name}>{person.name} {person.number}</p>)
+const Filter = ({ handler, value }) => {
   return (
     <div>
-    <h2>Numbers</h2>
-    {filterInput === '' ? personList : filteredPersonList}
+      filter shown with <input onChange={handler} value={value} />
+    </div>
+  )
+}
+
+const PersonForm = ({ handleSubmit, handleName, handleNumber, nameValue, numberValue }) => {
+  return (
+    <form onSubmit={handleSubmit}>
+      <div>
+        name: <input onChange={handleName} value={nameValue} />
+      </div>
+      <div>
+        number: <input onChange={handleNumber} value={numberValue} />
+      </div>
+      <div>
+        <button type="submit">add</button>
+      </div>
+    </form>
+  )
+}
+
+
+const Numbers = ({ persons, filterInput }) => {
+  const personList = persons.map(person =>
+    <p key={person.name}>{
+      person.name} {person.number}
+    </p>)
+
+  const filteredPersonList = persons
+    .filter(person => person.name
+      .toLowerCase()
+      .startsWith(filterInput.toLowerCase()))
+    .map(person =>
+      <p key={person.name}>
+        {person.name} {person.number}
+      </p>)
+
+  return (
+    <div>
+      <h2>Numbers</h2>
+      {filterInput === '' ? personList : filteredPersonList}
     </div>
   )
 }
@@ -15,9 +51,9 @@ const Numbers = ({ persons, filterInput }) => {
 
 const App = () => {
   const [persons, setPersons] = useState([
-    { 
+    {
       name: 'Arto Hellas',
-      number: '040-1231244' 
+      number: '040-1231244'
     },
     {
       name: 'Jasse Merivirta',
@@ -31,7 +67,7 @@ const App = () => {
       name: 'Henrik Roos',
       number: '233368873'
     }
-  ]) 
+  ])
   const [newName, setNewName] = useState('')
   const [newNumber, setNewNumber] = useState('')
   const [newFilter, setNewFilter] = useState('')
@@ -53,31 +89,19 @@ const App = () => {
     if (persons.find(person => person.name === newName)) {
       alert(`${newName} is already added to phonebook`)
     } else {
-    setPersons(persons.concat({name: newName, number: newNumber}))
+      setPersons(persons.concat({ name: newName, number: newNumber }))
 
-  }
-    setNewName('') 
+    }
+    setNewName('')
     setNewNumber('')
   }
 
   return (
     <div>
       <h2>Phonebook</h2>
-        <div>
-          filter shown with <input onChange={handleFilterChange} value={newFilter} />
-          </div>
-      <h2>add a new</h2>
-      <form onSubmit={handleSubmit}>
-        <div>
-          name: <input onChange={handleNameChange} value={newName} />
-        </div>
-        <div>
-          number: <input onChange={handleNumberChange} value={newNumber} />
-        </div>
-        <div>
-          <button type="submit">add</button>
-        </div>
-      </form>
+      <Filter handler={handleFilterChange} value={newFilter} />
+      <h2>Add a new</h2>
+      <PersonForm handleSubmit={handleSubmit} handleName={handleNameChange} handleNumber={handleNumberChange} nameValue={newName} numberValue={newNumber} />
       <Numbers persons={persons} filterInput={newFilter} />
     </div>
   )
