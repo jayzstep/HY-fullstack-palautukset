@@ -1,12 +1,26 @@
 import { useState, useEffect } from 'react'
 import axios from 'axios'
 
+const CountryData = ({country}) => {
+  return (
+    <div>
+      <h1>{country.name.common}</h1>
+      <p>capital {country.capital[0]}</p>
+      <p>area {country.area}</p>
+      <h3>languages:</h3>
+      <ul>
+        {Object.values(country.languages).map((language, index) => <li key={index}>{language}</li>)}
+      </ul>
+      <img src={country.flags.svg} alt="the flag" style={{width: 400}}/>
+    </div>
+  )
+}
 
 const Result = ({countries, search}) => {
   const filter = (countries) => (
-  countries
-  .filter(country => country.name.common.toLowerCase()
-  .includes(search.toLowerCase()))
+    countries
+    .filter(country => country.name.common.toLowerCase()
+    .includes(search.toLowerCase()))
   )
 
   const filteredList = filter(countries)
@@ -19,25 +33,10 @@ const Result = ({countries, search}) => {
 
   )})
 
-  const countryData = (country) => {
-    return (
-      <div>
-        <h1>{country.name.common}</h1>
-        <p>capital {country.capital[0]}</p>
-        <p>area {country.area}</p>
-        <h3>languages:</h3>
-        <ul>
-        {Object.values(country.languages).map((language, index) => <li key={index}>{language}</li>)}
-        </ul>
-        <img src={country.flags.svg} alt="the flag" style={{width: 400}}/>
-        
-      </div>
-    )
-  }
-  return(
+  return (
     <div>
       {filteredList.length > 10 ? "Too many matches, specify another filter" : 
-      filteredList.length === 1 ? countryData(filter(countries)[0]) : 
+      filteredList.length === 1 ? <CountryData country={filter(countries)[0]}/> : 
       filteredList}
     </div>
   )
