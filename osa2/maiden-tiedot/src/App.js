@@ -1,21 +1,30 @@
 import { useState, useEffect } from 'react'
 import axios from 'axios'
 
-const CountryData = ({country, api_key}) => {
-  const [coordinates, setCoordinates] =useState([])
-  //const [lon, lat] = coordinates
+const api_key = process.env.REACT_APP_API_KEY
+
+
+
+
+const CountryData = ({ country }) => {
+const [weather, setWeather] = useState({})
 
   useEffect(() => {
     axios
     .get(`http://api.openweathermap.org/geo/1.0/direct?q=${country.capital[0]}&limit=1&appid=${api_key}`)
     .then(response => {
-      setCoordinates([response.data[0]])
-    })
+      return ({lat: parseFloat(response.data[0].lat).toFixed(2), lon: parseFloat(response.data[0].lon).toFixed(2)})
+    }).then(latLon => axios
+      .get(`https://api.openweathermap.org/data/2.5/weather?lat=${latLon.lat}&lon=${latLon.lon}&appid=${api_key}`))
+      .then(response => {
+        setWeather(response.data)
+      })
   }, [])
 
+ 
   return (
     <div>
-      <div>{console.log(coordinates)}</div>
+      <div>{console.log(weather)}</div>
       <h1>{country.name.common}</h1>
       <p>capital {country.capital[0]}</p>
       <p>area {country.area}</p>
@@ -28,7 +37,12 @@ const CountryData = ({country, api_key}) => {
   )
 }
 
-const Result = ({countries, search, api_key}) => {
+
+
+
+
+
+const CountriesList = ({ countries, search }) => {
   const filter = (countries) => (
     countries
     .filter(country => country.name.common.toLowerCase()
@@ -42,24 +56,28 @@ const Result = ({countries, search, api_key}) => {
         {country.name.common}
         <button>show</button>
       </div>
-
   )})
+
+  const country = filter(countries)[0]
 
   return (
     <div>
-      {filteredList.length > 10 ? "Too many matches, specify another filter" : 
-      filteredList.length === 1 ? <CountryData country={filter(countries)[0]} api_key={api_key}/> : 
-      filteredList}
+      {filteredList.length > 10 ? "too many results" :
+      filteredList.length === 1 ? <CountryData country={filter(countries)[0]} /> : filteredList}
     </div>
   )
 }
 
 
+
+
+
+
 const App = () => {
-  const api_key = process.env.REACT_APP_API_KEY
+  
   const [countries, setCountries] = useState([])
   const [search, setSearch] = useState('')
-
+  
   useEffect(() => {
     axios
     .get('https://restcountries.com/v3.1/all')
@@ -67,9 +85,7 @@ const App = () => {
       setCountries(response.data)
     })
   }, [])
-
   
-
   const handleSearch = (event) => {
     setSearch(event.target.value)
   }
@@ -77,7 +93,7 @@ const App = () => {
   return (
     <div>
       Find countries <input onChange={handleSearch} value={search} />
-      <Result countries={countries} search={search} api_key={api_key} />
+      <CountriesList countries={countries} search={search} />
     </div>
   );
 }
