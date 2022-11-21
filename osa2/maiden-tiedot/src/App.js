@@ -5,6 +5,7 @@ const api_key = process.env.REACT_APP_API_KEY
 
 
 
+
 const WeatherData = ({ weather }) => {
   if (weather.weather) {
     const icon = `http://openweathermap.org/img/wn/${weather.weather[0].icon}@2x.png`
@@ -23,6 +24,12 @@ const WeatherData = ({ weather }) => {
     )
   }
 }
+
+
+
+
+
+
 const CountryData = ({ country }) => {
   const [weather, setWeather] = useState({})
 
@@ -56,15 +63,14 @@ const CountryData = ({ country }) => {
 
 
 
-
-
-
 const CountriesList = ({ countries, search }) => {
+
   const filter = (countries) => (
     countries
       .filter(country => country.name.common.toLowerCase()
         .includes(search.toLowerCase()))
   )
+
 
   const filteredList = filter(countries)
     .map(country => {
@@ -79,8 +85,8 @@ const CountriesList = ({ countries, search }) => {
   return (
     <div>
       {filteredList.length > 10 ? "too many results" :
-        filteredList.length === 1 ? <CountryData country={filter(countries)[0]} /> : 
-        filteredList}
+        filteredList.length === 1 ? <CountryData country={filter(countries)[0]} /> :
+          filteredList}
     </div>
   )
 }
