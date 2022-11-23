@@ -53,10 +53,8 @@ const Numbers = ({ persons, filterInput }) => {
 
 const App = () => {
   const [persons, setPersons] = useState([
-    {name:'asd',
-    number: '123',
-    id: '11'
-  }])
+    {name: 'asd', 
+    number: '123'}])
   const [newName, setNewName] = useState('')
   const [newNumber, setNewNumber] = useState('')
   const [newFilter, setNewFilter] = useState('')
@@ -68,6 +66,8 @@ const App = () => {
       setPersons(response.data.persons)
     })
   }, [])
+
+
 
   const handleNameChange = (event) => {
     setNewName(event.target.value)
@@ -86,8 +86,16 @@ const App = () => {
     if (persons.find(person => person.name === newName)) {
       alert(`${newName} is already added to phonebook`)
     } else {
-      setPersons(persons.concat({ name: newName, number: newNumber }))
+       const personObject = {
+         name: newName,
+          number: newNumber
+        }
 
+       axios.post('http://localhost:3001/persons', personObject)
+       .then(response => {
+          console.log(response)
+          setPersons(persons.concat(response.data))
+       })
     }
     setNewName('')
     setNewNumber('')
