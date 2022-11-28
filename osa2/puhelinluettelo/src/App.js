@@ -87,15 +87,35 @@ const App = () => {
     setNewFilter(event.target.value)
   }
 
+
   const handleSubmit = (event) => {
     event.preventDefault()
+    const personObject = {
+      name: newName,
+      number: newNumber
+    }
+
     if (persons.find(person => person.name === newName)) {
-      alert(`${newName} is already added to phonebook`)
-    } else {
-      const personObject = {
-        name: newName,
-        number: newNumber
+
+      const updatedPersonId = persons.filter(person => person.name === newName)[0].id
+
+      //TO DO: PÄIVITÄ TILA, ja confirm teksti
+      if (window.confirm(`${newName} is already added to phonebook, replace the old number with a new one?`)) {
+        personService
+          .update(updatedPersonId, newName, newNumber)
+          .then(response => setPersons(
+            persons.map(person => {
+              if (person.name === response.data.name) {
+                return (
+                  { ...person, number: response.data.number }
+                )
+              }
+              return person
+            })
+          ))
       }
+    } else {
+
 
       personService
         .create(personObject)
@@ -111,14 +131,16 @@ const App = () => {
   const handleDelete = (event) => {
     event.preventDefault()
     const deletedPersonId = event.target.value
-    console.log(deletedPersonId)
-    console.log(persons[0].id)
-    personService
-      .deletePerson(deletedPersonId)
-      .then(response => {
-        console.log(response)
-        setPersons(persons.filter(person => person.id != deletedPersonId))
-      })
+    const deletedPersonName = persons.filter(person => person.id == deletedPersonId)
+
+    if (window.confirm(`Delete ${deletedPersonName[0].name} ?`)) {
+      personService
+        .deletePerson(deletedPersonId)
+        .then(response => {
+          console.log(response)
+          setPersons(persons.filter(person => person.id != deletedPersonId))
+        })
+    }
   }
 
   return (
