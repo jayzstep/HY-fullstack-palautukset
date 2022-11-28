@@ -2,6 +2,35 @@ import { useState, useEffect } from 'react'
 import axios from 'axios'
 import personService from './services/persons'
 
+
+
+
+const Notification = ({ message, error }) => {
+  
+  const notificationStyle = {
+    color: "green",
+    background: "lightgrey",
+    fontSize: 20,
+    borderStyle: "solid"
+  }
+  if (error) {
+    notificationStyle.color = "red"
+  }
+
+  if (message === null) {
+    return null
+  }
+
+  return (
+    <div>
+      <h1 style={notificationStyle}>{message}</h1>
+    </div>
+  )
+}
+
+
+
+
 const Filter = ({ handler, value }) => {
   return (
     <div>
@@ -9,6 +38,9 @@ const Filter = ({ handler, value }) => {
     </div>
   )
 }
+
+
+
 
 const PersonForm = ({ handleSubmit, handleName, handleNumber, nameValue, numberValue }) => {
   return (
@@ -27,6 +59,7 @@ const PersonForm = ({ handleSubmit, handleName, handleNumber, nameValue, numberV
 }
 
 
+
 const Numbers = ({ persons, filterInput, handleDelete }) => {
   const personList = persons.map(person => (
     <div key={person.name}>
@@ -34,6 +67,7 @@ const Numbers = ({ persons, filterInput, handleDelete }) => {
       <button onClick={handleDelete} value={person.id}>delete</button>
     </div>
   ))
+
 
 
   const filteredPersonList = persons
@@ -55,6 +89,8 @@ const Numbers = ({ persons, filterInput, handleDelete }) => {
 }
 
 
+
+
 const App = () => {
   const [persons, setPersons] = useState([
     {
@@ -64,6 +100,7 @@ const App = () => {
   const [newName, setNewName] = useState('')
   const [newNumber, setNewNumber] = useState('')
   const [newFilter, setNewFilter] = useState('')
+  const [alertMessage, setAlertMessage] = useState({message: null, error: false})
 
   useEffect(() => {
     axios
@@ -99,7 +136,6 @@ const App = () => {
 
       const updatedPersonId = persons.filter(person => person.name === newName)[0].id
 
-      //TO DO: PÄIVITÄ TILA, ja confirm teksti
       if (window.confirm(`${newName} is already added to phonebook, replace the old number with a new one?`)) {
         personService
           .update(updatedPersonId, newName, newNumber)
@@ -112,7 +148,12 @@ const App = () => {
               }
               return person
             })
-          ))
+          )).catch(x =>
+            setAlertMessage({message: `${newName} has already been removed from server`, error: true}))
+        setAlertMessage({message: `${newName}'s number updated`, error: false})
+        setTimeout(() => {
+          setAlertMessage({message: null, error: false})
+        }, 3000)
       }
     } else {
 
@@ -123,10 +164,21 @@ const App = () => {
           console.log(response)
           setPersons(persons.concat(response.data))
         })
+        .then(confirmation =>
+          setAlertMessage({message: `Added ${newName}`, error: false}))
+
+      setTimeout(() => {
+        setAlertMessage({message: null, error: false})
+      }, 3000)
     }
     setNewName('')
     setNewNumber('')
+
   }
+
+
+
+
 
   const handleDelete = (event) => {
     event.preventDefault()
@@ -140,12 +192,21 @@ const App = () => {
           console.log(response)
           setPersons(persons.filter(person => person.id != deletedPersonId))
         })
+
+      setAlertMessage({message: `${deletedPersonName[0].name} deleted`, error: false})
+      setTimeout(() => {
+        setAlertMessage({message: null, error: false})
+      }, 3000)
     }
   }
 
+
+
+  
   return (
     <div>
       <h2>Phonebook</h2>
+      <Notification message={alertMessage.message} error={alertMessage.error} />
       <Filter handler={handleFilterChange} value={newFilter} />
       <h2>Add a new</h2>
       <PersonForm handleSubmit={handleSubmit} handleName={handleNameChange} handleNumber={handleNumberChange} nameValue={newName} numberValue={newNumber} />
