@@ -173,6 +173,7 @@ const App = () => {
           setAlertMessage({message: `Added ${newName}`, error: false}))
         .catch(error => {
           console.log(error.response.data)
+          //Tätä täytyy ehkä fiksata:
           setAlertMessage({message: `${JSON.stringify(error.response.data)}`, error: true})
         })
 
