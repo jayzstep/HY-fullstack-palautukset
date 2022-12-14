@@ -95,7 +95,8 @@ const App = () => {
   const [persons, setPersons] = useState([
     {
       name: 'asd',
-      number: '123'
+      number: '123',
+      id: '1'
     }])
   const [newName, setNewName] = useState('')
   const [newNumber, setNewNumber] = useState('')
@@ -104,11 +105,12 @@ const App = () => {
 
   useEffect(() => {
     axios
-      .get('http://localhost:3001/db')
+      .get('/api/persons')
       .then(response => {
-        setPersons(response.data.persons)
+        console.log(response.data)
+        setPersons(response.data)
       })
-  }, [])
+  }, []) 
 
 
 
@@ -133,8 +135,9 @@ const App = () => {
     }
 
     if (persons.find(person => person.name === newName)) {
-
-      const updatedPersonId = persons.filter(person => person.name === newName)[0].id
+       
+      const updatedPerson = persons.find(person => person.name === newName)
+      const updatedPersonId = updatedPerson.id
 
       if (window.confirm(`${newName} is already added to phonebook, replace the old number with a new one?`)) {
         personService
@@ -149,7 +152,9 @@ const App = () => {
               return person
             })
           )).catch(x =>
-            setAlertMessage({message: `${newName} has already been removed from server`, error: true}))
+            setAlertMessage({message: `${newName} has already been removed from server`, error: true})
+            )
+
         setAlertMessage({message: `${newName}'s number updated`, error: false})
         setTimeout(() => {
           setAlertMessage({message: null, error: false})
@@ -161,11 +166,15 @@ const App = () => {
       personService
         .create(personObject)
         .then(response => {
-          console.log(response)
+          console.log("Moi create personServicesta" + JSON.stringify(response.data))
           setPersons(persons.concat(response.data))
         })
         .then(confirmation =>
           setAlertMessage({message: `Added ${newName}`, error: false}))
+        .catch(error => {
+          console.log(error.response.data)
+          setAlertMessage({message: `${JSON.stringify(error.response.data)}`, error: true})
+        })
 
       setTimeout(() => {
         setAlertMessage({message: null, error: false})
@@ -183,14 +192,14 @@ const App = () => {
   const handleDelete = (event) => {
     event.preventDefault()
     const deletedPersonId = event.target.value
-    const deletedPersonName = persons.filter(person => person.id == deletedPersonId)
+    const deletedPersonName = persons.filter(person => person.id === deletedPersonId)
 
     if (window.confirm(`Delete ${deletedPersonName[0].name} ?`)) {
       personService
         .deletePerson(deletedPersonId)
         .then(response => {
           console.log(response)
-          setPersons(persons.filter(person => person.id != deletedPersonId))
+          setPersons(persons.filter(person => person.id !== deletedPersonId))
         })
 
       setAlertMessage({message: `${deletedPersonName[0].name} deleted`, error: false})
