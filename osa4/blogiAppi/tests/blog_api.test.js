@@ -105,7 +105,6 @@ test('deleting works and retuns status 204 if id is valid', async () => {
     const blogsAtStart = await Blog.find({})
     const blogToDelete = blogsAtStart[0]
 
-    console.log(blogToDelete.id)
 
     await api.delete(`/api/blogs/${blogToDelete.id}`).expect(204)
 })
