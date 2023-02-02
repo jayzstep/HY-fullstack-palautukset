@@ -7,7 +7,7 @@ const User = require('../models/user')
 
 
 blogsRouter.get('/', async (request, response) => {
-    const blogs = await Blog.find({}).populate('user', {username: 1, name: 1})
+    const blogs = await Blog.find({}).populate('user', { username: 1, name: 1 })
 
     response.json(blogs)
 
@@ -41,9 +41,23 @@ blogsRouter.post('/', async (request, response) => {
 })
 
 blogsRouter.delete('/:id', async (request, response) => {
-    //console.log(request.params.id)
-    await Blog.findByIdAndRemove(request.params.id)
-    response.status(204).end()
+    
+    const decodedToken = jwt.verify(request.token, process.env.SECRET)
+    if (!decodedToken.id) {
+        return response.status(401).json({ error: 'token invalid' })
+    }
+    const user = await User.findById(decodedToken.id)
+
+    const blog = await Blog.findById(request.params.id)
+
+    if (blog.user.toString() === user._id.toString()) {
+        await Blog.findByIdAndRemove(request.params.id)
+        response.status(204).end()
+    } else {
+        return response.status(401).json({ error: 'you can not do that'})
+    }
+
+
 })
 
 blogsRouter.put('/:id', async (request, response) => {
