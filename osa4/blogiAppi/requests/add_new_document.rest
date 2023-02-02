@@ -1,9 +1,11 @@
 POST HTTP://localhost:3003/api/blogs
 Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IlR1cmJvSG91IiwiaWQiOiI2M2RhOGI5MjdmNGNlOTY2ZDQ5ZDMwYmYiLCJpYXQiOjE2NzUzMzA3Njl9.NSd0TJU-bx6NSDuSAD9sCoJ_6qSnwc185Qmi1WrP930
 
 {
-    "title": "Rilke blogi",
-    "author": "Rilke",
-    "url": "Rilkenblogi.com",
-    "likes": 59498
+    "title": "Logic Tutorial part 2",
+    "author": "John Smith",
+    "url": "tutorials.com/logic",
+    "likes": 440775,
+    "user": "63da8b927f4ce966d49d30bf"
 }

@@ -57,7 +57,8 @@ test('blog can be added to /api/blogs', async () => {
         title: 'Koiramaailman kirjanpitoa',
         author: 'Rilke',
         url: 'rilkenblogi.fi',
-        likes: '1000000'
+        likes: '1000000',
+        userId: '63d93d1cef31b1f47d26f1a3'
     }
 
     const blogsAtStart = await api.get('/api/blogs')
@@ -77,7 +78,8 @@ test('if likes is empty, returns 0 likes', async () => {
         title: 'Folke Westin seikkailut',
         author: 'Folke West',
         url: 'bessamemucho.yök',
-        likes: null
+        likes: null,
+        userId: '63d93d1cef31b1f47d26f1a3'
     }
 
     const response = await api.post('/api/blogs').send(blogNoLikes)
@@ -91,7 +93,8 @@ test('returns 400 bad request if title or url is empty', async () => {
         title: '',
         author: 'Kille',
         url: '',
-        likes: 42
+        likes: 42,
+        userId: '63d93d1cef31b1f47d26f1a3'
     }
 
     const response = await api.post('/api/blogs').send(blogNoTitleAndUrl)
@@ -112,12 +115,12 @@ test('deleting works and retuns status 204 if id is valid', async () => {
 test('updating likes returns correct amount of likes', async () => {
     const blogsAtStart = await Blog.find({})
     const blogToUpdate = blogsAtStart[0]
+    
     blogToUpdate.likes = 60000
 
     await api.put(`/api/blogs/${blogToUpdate.id}`).send(blogToUpdate)
     const blogsAfterUpdating = await Blog.find({})
-
-    expect(blogsAfterUpdating.likes).toBe(60000)
+    expect(blogsAfterUpdating[0].likes).toBe(60000)
 })
 
 afterAll(() => {

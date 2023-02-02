@@ -1,3 +1,8 @@
+const mongoose = require('mongoose')
+const supertest = require('supertest')
+const app = require('../app')
+const helper = require('../utils/test_helper')
+const api = supertest(app)
 const bcrypt = require('bcrypt')
 const User = require('../models/user')
 
@@ -7,15 +12,16 @@ describe('when there is one user in the db', () => {
 
         const passwordHash = await bcrypt.hash('siikret', 10)
         const user = new User({
-            username: 'Jasse',
-            passwordHash
+            username: 'Root',
+            name: 'Testing Test',
+            passwordHash: passwordHash
         })
 
         await user.save()
     })
 
     test('creating a new user succeeds', async () => {
-        const usersAtStart = await User.find({})
+        const usersAtStart = await helper.usersInDb()
 
         const newUser = {
             username: 'jmeriv',
@@ -29,8 +35,8 @@ describe('when there is one user in the db', () => {
             .expect(201)
             .expect('Content-Type', /application\/json/)
 
-        const usersAtEnd = await User.find({})
-        expect(usersAtEnd).toHaveLength(usersAtStart + 1)
+        const usersAtEnd = await helper.usersInDb()
+        expect(usersAtEnd).toHaveLength(usersAtStart.length + 1)
 
     })
 
@@ -43,6 +49,18 @@ describe('when there is one user in the db', () => {
         await api
             .post('/api/users')
             .send(tooShortUsername)
+            .expect(400)
+    })
+
+    test('if username already exists, returns 400 and error message', async () => {
+        const alreadyExists = {
+            username: 'Root',
+            name: 'Testing Test',
+            password: 'dipdip'
+        }
+        await api
+            .post('/api/users')
+            .send(alreadyExists)
             .expect(400)
     })
 })
