@@ -21,7 +21,7 @@ const initialBlogs = [
     }
 ]
 
-//mökillä tulee timeout deletemanyn kohdalla, täytyy kokeilla kotona:
+
 beforeEach(async () => {
     await Blog.deleteMany({})
     let blogObject = new Blog(initialBlogs[0])
