@@ -1,28 +1,45 @@
-const Newblog = ({ blog, setNewBlog, handleCreate }) => (
+import { useState } from "react"
 
+
+const Newblog = ({ handleCreate }) => {
+    const [newBlog, setNewBlog] = useState({ title: '', author: '', url: '' })
+
+    const addBlog = (event) => {
+        event.preventDefault()
+        handleCreate({
+            title: newBlog.title,
+            author: newBlog.author,
+            url: newBlog.url
+
+        })
+
+        setNewBlog({ title: '', author: '', url: '' })
+    }
+
+    return (
     <div>
         <h2>Create New Entry</h2>
-        <form>
+        <form onSubmit={addBlog}>
             <div>Title:<input type="text"
-                value={blog.title}
-                onChange={({ target }) => setNewBlog({ ...blog, title: target.value })} >
+                value={newBlog.title}
+                onChange={({ target }) => setNewBlog({ ...newBlog, title: target.value })} >
             </input>
             </div>
             <div>Author:<input type="text"
-                value={blog.author}
-                onChange={({ target }) => setNewBlog({ ...blog, author: target.value })}>
+                value={newBlog.author}
+                onChange={({ target }) => setNewBlog({ ...newBlog, author: target.value })}>
             </input>
             </div>
             <div>Url:<input type="text"
-                value={blog.url}
-                onChange={({ target }) => setNewBlog({ ...blog, url: target.value })}>
+                value={newBlog.url}
+                onChange={({ target }) => setNewBlog({ ...newBlog, url: target.value })}>
             </input>
             </div>
 
-            <button onClick={handleCreate}>create</button>
+            <button type="submit">create</button>
         </form>
     </div>
-
-)
+    )
+}
 
 export default Newblog
