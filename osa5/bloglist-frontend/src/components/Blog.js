@@ -23,7 +23,7 @@ const Blog = ({ blog }) => {
         {blog.title} <button onClick={toggleVisibility}>{visible ? 'hide' : 'view'}</button>
       </div>
       <div style ={showBlog}>
-        {blog.author} <br />{blog.url} <br /> likes: {blog.likes}
+        {blog.author} <br />{blog.url}<br /> likes: {blog.likes} <br /> {blog.user.name}
       </div>
     </div>
   )
