@@ -109,7 +109,7 @@ const App = () => {
           <Newblog handleCreate={handleCreate} />
         </Togglable>
         <h2>Blogs</h2>
-        {blogs.map(blog =>
+        {blogs.sort((a,b) => a.likes - b.likes).reverse().map(blog =>
           <Blog key={blog.id} blog={blog} handleLike={handleLike} />
         )}
       </div>
