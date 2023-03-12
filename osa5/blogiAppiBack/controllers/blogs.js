@@ -34,7 +34,7 @@ router.delete('/:id', async (request, response) => {
         return response.status(204).end()
     }
 
-    if (blogToDelete.user && blogToDelete.user.toString() !== request.user.id) {
+    if (blogToDelete.user && blogToDelete.user.toString() !== request.body.user.id) {
         return response.status(401).json({
             error: 'only the creator can delete a blog'
         })

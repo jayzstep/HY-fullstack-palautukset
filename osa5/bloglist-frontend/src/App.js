@@ -66,10 +66,12 @@ const App = () => {
   }
 
   const handleCreate = async (blogObject) => {
-    
+      console.log(user)
       newBlogFormRef.current.toggleVisibility()
+
       const returnedBlog = await blogService.create(blogObject)
-      setBlogs(blogs.concat({...returnedBlog, user : {name: user.name}}))
+      console.log(returnedBlog)
+      setBlogs(blogs.concat({...returnedBlog, user : {name: user.name, id: returnedBlog.user}}))
       setErrorMessage(`A new blog ${blogObject.title} by ${blogObject.author} added!`)
       setTimeout(() => {
         setErrorMessage(null)
@@ -92,6 +94,15 @@ const App = () => {
     setBlogs(blogs.map(blog => blog.id !== updatedBlog.id ? blog : {...blog, likes: blog.likes + 1} ))
   }
 
+  const handleRemove = async (blog) => {
+    const id = blog.id
+    
+    await blogService.remove(id, blog)
+    
+
+    setBlogs(blogs.filter(b => b.id !== id))
+  }
+
   const newBlogFormRef = useRef()
 
   return (
@@ -110,7 +121,7 @@ const App = () => {
         </Togglable>
         <h2>Blogs</h2>
         {blogs.sort((a,b) => a.likes - b.likes).reverse().map(blog =>
-          <Blog key={blog.id} blog={blog} handleLike={handleLike} />
+          <Blog key={blog.id} blog={blog} user={user.name} handleLike={handleLike} handleRemove={handleRemove} />
         )}
       </div>
       }
