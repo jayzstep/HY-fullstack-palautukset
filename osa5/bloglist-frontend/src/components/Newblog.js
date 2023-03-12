@@ -9,7 +9,8 @@ const Newblog = ({ handleCreate }) => {
         handleCreate({
             title: newBlog.title,
             author: newBlog.author,
-            url: newBlog.url
+            url: newBlog.url,
+            likes: 0
 
         })
 
