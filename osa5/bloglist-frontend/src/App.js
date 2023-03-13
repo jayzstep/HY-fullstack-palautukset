@@ -14,7 +14,7 @@ const App = () => {
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [user, setUser] = useState(null)
-  
+
 
   useEffect(() => {
     blogService.getAll().then(blogs =>
@@ -66,17 +66,17 @@ const App = () => {
   }
 
   const handleCreate = async (blogObject) => {
-      console.log(user)
-      newBlogFormRef.current.toggleVisibility()
+    console.log(user)
+    newBlogFormRef.current.toggleVisibility()
 
-      const returnedBlog = await blogService.create(blogObject)
-      console.log(returnedBlog)
-      setBlogs(blogs.concat({...returnedBlog, user : {name: user.name, id: returnedBlog.user}}))
-      setErrorMessage(`A new blog ${blogObject.title} by ${blogObject.author} added!`)
-      setTimeout(() => {
-        setErrorMessage(null)
-      }, 5000)
-    
+    const returnedBlog = await blogService.create(blogObject)
+    console.log(returnedBlog)
+    setBlogs(blogs.concat({ ...returnedBlog, user : { name: user.name, id: returnedBlog.user } }))
+    setErrorMessage(`A new blog ${blogObject.title} by ${blogObject.author} added!`)
+    setTimeout(() => {
+      setErrorMessage(null)
+    }, 5000)
+
   }
 
   const handleLike = async (blog) => {
@@ -88,17 +88,17 @@ const App = () => {
       likes : blog.likes + 1,
       user: blog.user.id
     }
-    
+
     const updatedBlog = await blogService.update(id, blogToUpdate)
-    
-    setBlogs(blogs.map(blog => blog.id !== updatedBlog.id ? blog : {...blog, likes: blog.likes + 1} ))
+
+    setBlogs(blogs.map(blog => blog.id !== updatedBlog.id ? blog : { ...blog, likes: blog.likes + 1 } ))
   }
 
   const handleRemove = async (blog) => {
     const id = blog.id
-    
+
     await blogService.remove(id, blog)
-    
+
 
     setBlogs(blogs.filter(b => b.id !== id))
   }

@@ -1,3 +1,5 @@
+import { PropTypes } from 'prop-types'
+
 const Loginform = ({
   handleLogin,
   username,
@@ -30,6 +32,14 @@ const Loginform = ({
       </form>
     </div>
   )
+}
+
+Loginform.propTypes = {
+  handleLogin: PropTypes.func.isRequired,
+  setUsername: PropTypes.func.isRequired,
+  setPassword: PropTypes.func.isRequired,
+  username: PropTypes.string.isRequired,
+  password: PropTypes.string.isRequired
 }
 
 export default Loginform
