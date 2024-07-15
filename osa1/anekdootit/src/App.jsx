@@ -53,6 +53,7 @@ const App = () => {
       <Button handleClick={handleVote} text="Vote" />
       <h1>Anecdote with most votes</h1>
       <p>{anecdotes[mostVoted]}</p>
+      <p>has {points[mostVoted]} votes</p>
 
     </div>
   )
