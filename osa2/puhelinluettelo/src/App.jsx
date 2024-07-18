@@ -6,24 +6,24 @@ const Notification = ({ message, error }) => {
     return null;
   }
 
-const messageStyle = error
-  ? {
+  const messageStyle = error
+    ? {
       color: "red",
       paddingTop: 5,
       padding: "10px",
       fontSize: 15,
       backgroundColor: "#f0f0f0",
       border: "2px solid red",
-      borderRadius: "5px"
+      borderRadius: "5px",
     }
-  : {
+    : {
       color: "green",
       paddingTop: 5,
       padding: "10px",
       fontSize: 15,
       backgroundColor: "#f0f0f0",
       border: "2px solid green",
-      borderRadius: "5px"
+      borderRadius: "5px",
     };
   return <div style={messageStyle}>{message}</div>;
 };
@@ -54,9 +54,7 @@ const Persons = ({ persons, filter, handleDelete }) => {
     )
     .map((person, i) => (
       <div key={i}>
-        <p>
           {person.name} {person.number}
-        </p>
         <button onClick={handleDelete} value={person.id}>
           delete
         </button>
@@ -101,7 +99,7 @@ const App = () => {
   const [newName, setNewName] = useState("");
   const [newNumber, setNewNumber] = useState("");
   const [newFilter, setNewFilter] = useState("");
-  const [message, setMessage] = useState("");
+  const [message, setMessage] = useState(null);
   const [error, setError] = useState(true);
 
   useEffect(() => {
@@ -125,62 +123,74 @@ const App = () => {
       ) {
         const personId = persons.filter((person) => person.name === newName)[0]
           .id;
-        personService.update(personId, personObject).then((response) => {
-          setPersons(
-            persons.map((person) =>
-              person.name === response.name
-                ? { ...person, number: newNumber }
-                : person,
-            ),
-          );
-        })
-        .catch((error) => {
-          setError(true);
-          setMessage(`${newName} was already removed from the server `);
-          setTimeout(() => {
-            setMessage(null);
-          }, 5000);
-      });
-      setError(false);
-      setMessage(`Updated number for ${newName}`);
-      setNewName("");
-      setNewNumber("");
-      setTimeout(() => {
-        setMessage(null);
-      }, 5000);
+        personService
+          .update(personId, personObject)
+          .then((response) => {
+            setPersons(
+              persons.map((person) =>
+                person.name === response.name
+                  ? { ...person, number: newNumber }
+                  : person,
+              ),
+            );
+          })
+          .catch((error) => {
+            setError(true);
+            setMessage(`${newName} was already removed from the server `);
+            setTimeout(() => {
+              setMessage(null);
+            }, 5000);
+          });
+        setError(false);
+        setMessage(`Updated number for ${newName}`);
+        setNewName("");
+        setNewNumber("");
+        setTimeout(() => {
+          setMessage(null);
+        }, 5000);
       }
       return;
     }
 
-    personService.create(personObject).then((response) => {
-      setPersons(persons.concat(response));
-      setNewNumber("");
-      setNewName("");
-      setError(false);
-      setMessage(`Added ${newName}`);
-      setTimeout(() => {
-        setMessage(null);
-      }, 5000);
-    });
+    personService
+      .create(personObject)
+      .then((response) => {
+        setPersons(persons.concat(response));
+        setNewNumber("");
+        setNewName("");
+        setError(false);
+        setMessage(`Added ${newName}`);
+        setTimeout(() => {
+          setMessage(null);
+        }, 5000);
+      })
+      .catch((error) => {
+        setError(true);
+        setMessage(`${error.response.data.error}`);
+        setTimeout(() => {
+          setMessage(null);
+        }, 5000);
+      });
   };
 
   const handleDelete = (event) => {
     event.preventDefault();
     const deletedPersonId = event.target.value;
+    // console.log(persons)
+    // console.log(deletedPersonId)
     const deletedPersonName = persons.filter(
       (person) => person.id === deletedPersonId,
     )[0].name;
+
     if (window.confirm(`Delete ${deletedPersonName}?`)) {
-      personService
-        .remove(event.target.value)
-        .then((response) => {
-          setPersons(persons.filter((person) => person.id !== response.id));
-          setError(false);
-          setMessage(`Deleted ${deletedPersonName}`);
-          setTimeout(() => {
-            setMessage(null);
-          }, 5000);
-        });
+      personService.remove(deletedPersonId).then((response) => {
+        setPersons(persons.filter((person) => person.id !== deletedPersonId));
+        setError(false);
+        setMessage(`Deleted ${deletedPersonName}`);
+        setTimeout(() => {
+          setMessage(null);
+        }, 5000);
+      });
     }
   };
 
