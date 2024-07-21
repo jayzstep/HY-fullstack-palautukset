@@ -1,3 +1,6 @@
+// only:
+// npm run test -- --test-only
+//
 const { test, after, beforeEach } = require('node:test')
 const assert = require('node:assert')
 const Blog = require('../models/blog')
@@ -6,27 +9,14 @@ const supertest = require('supertest')
 const app = require('../app')
 
 const api = supertest(app)
-
-const initialBlogs = [
-  {
-    title: 'Ableton',
-    author: 'Jasse Merivirta',
-    url: 'www.ableton.fi',
-    likes: 15
-  },
-  {
-    title: 'Koirat',
-    author: 'Reeta Holopainen',
-    url: 'www.rilke.fi',
-    likes: 491
-  }
-]
+const helper = require('./test_helper')
+const { on } = require('node:events')
 
 beforeEach(async () => {
   await Blog.deleteMany({})
-  let blogObject = new Blog(initialBlogs[0])
+  let blogObject = new Blog(helper.initialBlogs[0])
   await blogObject.save()
-  blogObject = new Blog(initialBlogs[1])
+  blogObject = new Blog(helper.initialBlogs[1])
   await blogObject.save()
 })
 
@@ -40,7 +30,7 @@ test('blogs are returned as json', async () => {
 test('there are two blogs', async () => {
   const response = await api.get('/api/blogs')
 
-  assert.strictEqual(response.body.length, initialBlogs.length)
+  assert.strictEqual(response.body.length, helper.initialBlogs.length)
 })
 
 test('the first blog is about Ableton', async () => {
@@ -75,12 +65,10 @@ test('a valid blog can be added', async () => {
 
   const titles = response.body.map(blog => blog.title)
 
-  assert.strictEqual(response.body.length, initialBlogs.length + 1)
+  assert.strictEqual(response.body.length, helper.initialBlogs.length + 1)
 
   assert(titles.includes('Kissat'))
 })
-
-
 
 test('if no likes, likes is 0', async () => {
   const newBlog = {
@@ -93,8 +81,7 @@ test('if no likes, likes is 0', async () => {
   assert.strictEqual(response.body.likes, 0)
 })
 
-
-test('returns 400 bar request if title or url is missing', async () => {
+test('returns 400 bad request if title or url is missing', async () => {
   const noTitleBlog = {
     author: 'Tim-Antti',
     url: 'www.korut.com',
@@ -109,6 +96,38 @@ test('returns 400 bar request if title or url is missing', async () => {
   await api.post('/api/blogs').send(noTitleBlog).expect(400)
   await api.post('/api/blogs').send(noUrlBlog).expect(400)
 
-  const response = await api.get('/api/blogs')
-  assert.strictEqual(response.body.length, initialBlogs.length)
+  const response = await helper.blogsInDb()
+  assert.strictEqual(response.length, helper.initialBlogs.length)
+})
+
+test('deletion of a blog returns code 204 if id is valid', async () => {
+  const blogsAtStart = await helper.blogsInDb()
+  const blogToDelete = blogsAtStart[0]
+  await api.delete(`/api/blogs/${blogToDelete.id}`).expect(204)
+
+  const blogsAtEnd = await helper.blogsInDb()
+
+  const titles = blogsAtEnd.map(blog => blog.title)
+
+  assert(!titles.includes(blogToDelete.title))
+  assert.strictEqual(blogsAtEnd.length, blogsAtStart.length - 1)
+})
+
+test('updating likes for a blog updates its likes', async () => {
+  const blogsAtStart = await helper.blogsInDb()
+  const blogToUpdate = blogsAtStart[0]
+
+  const updatedBlog = {
+    title: blogToUpdate.title,
+    author: blogToUpdate.author,
+    url: blogToUpdate.url,
+    likes: blogToUpdate.likes + 1
+  }
+
+  await api.put(`/api/blogs/${blogToUpdate.id}`).send(updatedBlog).expect(200)
+
+  const blogsAtEnd = await helper.blogsInDb()
+  const blogAfterUpdate = blogsAtEnd[0]
+
+  assert.strictEqual(blogToUpdate.likes +1, blogAfterUpdate.likes)
 })

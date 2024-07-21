@@ -77,7 +77,7 @@ describe('total likes', () => {
     assert.strictEqual(result, 0)
   })
 
-  test('when list has only one blog equals the likes of that', () => {
+  test('when list has just one blog equals the likes of that', () => {
     const result = listHelper.totalLikes(listWithOneBlog)
     assert.strictEqual(result, 5)
   })
@@ -105,7 +105,7 @@ describe('favorite blog', () => {
     assert.deepStrictEqual(result, mostLiked)
   })
 
-  test('returns the blog if only one blog', () => {
+  test('returns the blog if just one blog', () => {
     const onlyOne = {
       title: listWithOneBlog[0].title,
       author: listWithOneBlog[0].author,
