@@ -65,6 +65,36 @@ describe('when there is initially one user at db', () => {
     assert.strictEqual(usersAtEnd.length, usersAtStart.length)
   })
 
+  test('creation fails if username or password missing', async () => {
+    const usersAtStart = await helper.usersInDb()
+
+    const noUsername = {
+      name: 'noUsername',
+      password: 'salainen'
+    }
+    const result = await api.post('/api/users').send(noUsername).expect(400)
+    const usersAtEnd = await helper.usersInDb()
+
+    assert(result.body.error.includes('Username or password missing'))
+
+    assert.strictEqual(usersAtEnd.length, usersAtStart.length)
+  })
+
+  test('creation fails if username or password too short', async () => {
+    const usersAtStart = await helper.usersInDb()
+
+    const tooShortUserName = {
+      username: 'ab',
+      name: 'abloy',
+      password: 'salainen'
+    }
+    const result = await api.post('/api/users').send(tooShortUserName).expect(400)
+    const usersAtEnd = await helper.usersInDb()
+
+    assert(result.body.error.includes('Username or password too short'))
+
+    assert.strictEqual(usersAtEnd.length, usersAtStart.length)
+  })
   after(async () => {
     await User.deleteMany({})
     await mongoose.connection.close()
