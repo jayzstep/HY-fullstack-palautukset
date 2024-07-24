@@ -1,18 +1,28 @@
 // only:
 // npm run test -- --test-only
 //
-const { test, after, beforeEach } = require('node:test')
+const { test, after, beforeEach, describe } = require('node:test')
 const assert = require('node:assert')
 const Blog = require('../models/blog')
+const User = require('../models/user')
 const mongoose = require('mongoose')
 const supertest = require('supertest')
 const app = require('../app')
 
 const api = supertest(app)
+const bcrypt = require('bcrypt')
 const helper = require('./test_helper')
-const { on } = require('node:events')
+
+let userId
 
 beforeEach(async () => {
+  await User.deleteMany({})
+  const passwordHash = await bcrypt.hash('sekret', 10)
+  const user = new User({ username: 'root', passwordHash })
+
+  await user.save()
+  userId = user._id
+
   await Blog.deleteMany({})
   let blogObject = new Blog(helper.initialBlogs[0])
   await blogObject.save()
@@ -57,7 +67,8 @@ test('a valid blog can be added', async () => {
     title: 'Kissat',
     author: 'Hannu Mautemps',
     url: 'www.kissakissa.fi',
-    likes: 47
+    likes: 47,
+    userId: userId
   }
   await api.post('/api/blogs').send(newBlog).expect(201)
 
@@ -75,7 +86,8 @@ test('if no likes, likes is 0', async () => {
     title: 'Logic',
     author: 'Pommi Taju',
     url: 'www.logic.net',
-    likes: null
+    likes: null,
+    userId: userId
   }
   const response = await api.post('/api/blogs').send(newBlog)
   assert.strictEqual(response.body.likes, 0)
@@ -85,12 +97,14 @@ test('returns 400 bad request if title or url is missing', async () => {
   const noTitleBlog = {
     author: 'Tim-Antti',
     url: 'www.korut.com',
-    likes: 999
+    likes: 999,
+    userId: userId
   }
   const noUrlBlog = {
     title: 'Koruja',
     author: 'Tim-Antti',
-    likes: 999
+    likes: 999,
+    userId: userId
   }
 
   await api.post('/api/blogs').send(noTitleBlog).expect(400)
@@ -129,5 +143,5 @@ test('updating likes for a blog updates its likes', async () => {
   const blogsAtEnd = await helper.blogsInDb()
   const blogAfterUpdate = blogsAtEnd[0]
 
-  assert.strictEqual(blogToUpdate.likes +1, blogAfterUpdate.likes)
+  assert.strictEqual(blogToUpdate.likes + 1, blogAfterUpdate.likes)
 })
