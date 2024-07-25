@@ -23,7 +23,6 @@ describe('when there is initially one user at db', () => {
 
   test('creation succeeds with a fresh username', async () => {
     const usersAtStart = await helper.usersInDb()
-    console.log(`users at start: ${usersAtStart}`)
 
     const newUser = {
       username: 'uaua',
