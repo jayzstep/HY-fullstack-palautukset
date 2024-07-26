@@ -9,24 +9,34 @@ const mongoose = require('mongoose')
 const supertest = require('supertest')
 const app = require('../app')
 
-const api = supertest(app)
 const bcrypt = require('bcrypt')
 const helper = require('./test_helper')
 
 let userId
+let token
+const api = supertest(app)
+const server = supertest.agent(app)
 
 beforeEach(async () => {
   await User.deleteMany({})
+  await Blog.deleteMany({})
+
   const passwordHash = await bcrypt.hash('sekret', 10)
   const user = new User({ username: 'root', passwordHash })
-
   await user.save()
   userId = user._id
 
-  await Blog.deleteMany({})
-  let blogObject = new Blog(helper.initialBlogs[0])
+  const response = await api
+    .post('/api/login')
+    .send({ username: 'root', password: 'sekret' })
+  token = response.body.token
+  server.set('Authorization', `Bearer ${token}`)
+
+  const blog1 = { ...helper.initialBlogs[0], user: userId }
+  const blog2 = { ...helper.initialBlogs[1], user: userId }
+  let blogObject = new Blog(blog1)
   await blogObject.save()
-  blogObject = new Blog(helper.initialBlogs[1])
+  blogObject = new Blog(blog2)
   await blogObject.save()
 })
 
@@ -70,7 +80,7 @@ test('a valid blog can be added', async () => {
     likes: 47,
     userId: userId
   }
-  await api.post('/api/blogs').send(newBlog).expect(201)
+  await server.post('/api/blogs').send(newBlog).expect(201)
 
   const response = await api.get('/api/blogs')
 
@@ -89,7 +99,7 @@ test('if no likes, likes is 0', async () => {
     likes: null,
     userId: userId
   }
-  const response = await api.post('/api/blogs').send(newBlog)
+  const response = await server.post('/api/blogs').send(newBlog)
   assert.strictEqual(response.body.likes, 0)
 })
 
@@ -107,8 +117,8 @@ test('returns 400 bad request if title or url is missing', async () => {
     userId: userId
   }
 
-  await api.post('/api/blogs').send(noTitleBlog).expect(400)
-  await api.post('/api/blogs').send(noUrlBlog).expect(400)
+  await server.post('/api/blogs').send(noTitleBlog).expect(400)
+  await server.post('/api/blogs').send(noUrlBlog).expect(400)
 
   const response = await helper.blogsInDb()
   assert.strictEqual(response.length, helper.initialBlogs.length)
@@ -117,7 +127,7 @@ test('returns 400 bad request if title or url is missing', async () => {
 test('deletion of a blog returns code 204 if id is valid', async () => {
   const blogsAtStart = await helper.blogsInDb()
   const blogToDelete = blogsAtStart[0]
-  await api.delete(`/api/blogs/${blogToDelete.id}`).expect(204)
+  await server.delete(`/api/blogs/${blogToDelete.id}`).expect(204)
 
   const blogsAtEnd = await helper.blogsInDb()
 
