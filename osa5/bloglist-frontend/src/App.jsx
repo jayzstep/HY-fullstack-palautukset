@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import Blog from "./components/Blog";
+import LoginForm from "./components/Loginform";
 import blogService from "./services/blogs";
 import loginService from "./services/login";
 
@@ -26,6 +27,14 @@ const App = () => {
     }
   }, []);
 
+  const handleUsernameChange = (event) => {
+    setUsername(event.target.value);
+  };
+
+  const handlePasswordChange = (event) => {
+    setPassword(event.target.value);
+  };
+
   const flash = (aMessage) => {
     setMessage(aMessage);
     setTimeout(() => {
@@ -43,7 +52,7 @@ const App = () => {
       setUsername("");
       setPassword("");
     } catch (exception) {
-      flash("wrong credentials")
+      flash("wrong credentials");
     }
   };
   const handleCreate = async (event) => {
@@ -53,10 +62,10 @@ const App = () => {
       console.log(response);
       let newBlog = { title: title, author: author, url: url, id: response.id };
       setBlogs((blogs) => [...blogs, newBlog]);
-      let message = `${response.title} by ${response.author} created!`
-      flash(message)
+      let message = `${response.title} by ${response.author} created!`;
+      flash(message);
     } catch (exception) {
-      flash("error creating blog")
+      flash("error creating blog");
     }
   };
 
@@ -64,33 +73,6 @@ const App = () => {
     window.localStorage.clear();
     setUser(null);
   };
-
-  const loginForm = () => (
-    <div>
-      <h2>Login</h2>
-      <form onSubmit={handleLogin}>
-        <div>
-          username
-          <input
-            type="text"
-            value={username}
-            name="Username"
-            onChange={({ target }) => setUsername(target.value)}
-          />
-        </div>
-        <div>
-          password
-          <input
-            type="password"
-            value={password}
-            name="Password"
-            onChange={({ target }) => setPassword(target.value)}
-          />
-        </div>
-        <button type="submit">Login</button>
-      </form>
-    </div>
-  );
 
   const Notification = ({ message }) => {
     return (
@@ -140,7 +122,15 @@ const App = () => {
     <div>
       <h1>BlogApp</h1>
       <Notification message={message} />
-      {!user && loginForm()}
+      {!user && (
+        <LoginForm
+          handleLogin={handleLogin}
+          handleUsernameChange={handleUsernameChange}
+          handlePasswordChange={handlePasswordChange}
+          username={username}
+          password={password}
+        />
+      )}
       {user && (
         <div>
           <p>{user.name} logged in</p>
