@@ -29,7 +29,7 @@ const LoginForm = ({ flash, setUser }) => {
             type="text"
             value={username}
             name="Username"
-            onChange={(event) => setUsername(event.target.value)}
+            onChange={({ target }) => setUsername(target.value)}
           />
         </div>
         <div>
@@ -38,13 +38,13 @@ const LoginForm = ({ flash, setUser }) => {
             type="password"
             value={password}
             name="Password"
-            onChange={(event) => setPassword(event.target.value)}
+            onChange={({ target }) => setPassword(target.value)}
           />
         </div>
         <button type="submit">Login</button>
       </form>
-    </div>);
-
+    </div>
+  );
 };
 
 export default LoginForm;

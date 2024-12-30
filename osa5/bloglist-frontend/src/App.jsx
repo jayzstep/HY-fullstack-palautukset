@@ -1,15 +1,13 @@
 import { useState, useEffect } from "react";
 import Blog from "./components/Blog";
 import LoginForm from "./components/Loginform";
+import NewBlogForm from "./components/NewBlogForm";
 import blogService from "./services/blogs";
 
 const App = () => {
   const [blogs, setBlogs] = useState([]);
   const [message, setMessage] = useState(null);
   const [user, setUser] = useState(null);
-  const [title, setTitle] = useState("");
-  const [author, setAuthor] = useState("");
-  const [url, setUrl] = useState("");
 
   useEffect(() => {
     blogService.getAll().then((blogs) => setBlogs(blogs));
@@ -31,20 +29,6 @@ const App = () => {
     }, 5000);
   };
 
-  const handleCreate = async (event) => {
-    event.preventDefault();
-    try {
-      const response = await blogService.create({ title, author, url });
-      console.log(response);
-      let newBlog = { title: title, author: author, url: url, id: response.id };
-      setBlogs((blogs) => [...blogs, newBlog]);
-      let message = `${response.title} by ${response.author} created!`;
-      flash(message);
-    } catch (exception) {
-      flash("error creating blog");
-    }
-  };
-
   const handleLogout = async (event) => {
     window.localStorage.clear();
     setUser(null);
@@ -57,42 +41,6 @@ const App = () => {
       </div>
     );
   };
-
-  const newBlogForm = () => (
-    <div>
-      <h2>Create New Blog</h2>
-      <form onSubmit={handleCreate}>
-        <div>
-          title
-          <input
-            type="text"
-            value={title}
-            name="Title"
-            onChange={({ target }) => setTitle(target.value)}
-          />
-        </div>
-        <div>
-          author
-          <input
-            type="text"
-            value={author}
-            name="Author"
-            onChange={({ target }) => setAuthor(target.value)}
-          />
-        </div>
-        <div>
-          url
-          <input
-            type="text"
-            value={url}
-            name="Url"
-            onChange={({ target }) => setUrl(target.value)}
-          />
-        </div>
-        <button type="submit">Create</button>
-      </form>
-    </div>
-  );
 
   return (
     <div>
@@ -109,7 +57,7 @@ const App = () => {
           ))}
         </div>
       )}
-      {user && newBlogForm()}
+      {user && <NewBlogForm flash={flash} setBlogs={setBlogs} />}
     </div>
   );
 };
