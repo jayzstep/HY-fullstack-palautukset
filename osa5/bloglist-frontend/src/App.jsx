@@ -1,13 +1,16 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Blog from "./components/Blog";
 import LoginForm from "./components/Loginform";
 import NewBlogForm from "./components/NewBlogForm";
 import blogService from "./services/blogs";
+import Togglable from "./components/Togglable";
 
 const App = () => {
   const [blogs, setBlogs] = useState([]);
-  const [message, setMessage] = useState(null);
+  const [alertMessage, setAlertMessage] = useState(null);
   const [user, setUser] = useState(null);
+
+  const blogFormRef = useRef()
 
   useEffect(() => {
     blogService.getAll().then((blogs) => setBlogs(blogs));
@@ -23,16 +26,20 @@ const App = () => {
   }, []);
 
   const flash = (aMessage) => {
-    setMessage(aMessage);
+    setAlertMessage(aMessage);
     setTimeout(() => {
-      setMessage(null);
+      setAlertMessage(null);
     }, 5000);
   };
 
-  const handleLogout = async (event) => {
+  const handleLogout = async () => {
     window.localStorage.clear();
     setUser(null);
   };
+
+  const toggleVisibility = () => {
+    blogFormRef.current.toggleVisibility()
+  }
 
   const Notification = ({ message }) => {
     return (
@@ -45,19 +52,23 @@ const App = () => {
   return (
     <div>
       <h1>BlogApp</h1>
-      <Notification message={message} />
+      <Notification message={alertMessage} />
       {!user && <LoginForm flash={flash} setUser={setUser} />}
       {user && (
         <div>
           <p>{user.name} logged in</p>
           <button onClick={handleLogout}>logout</button>
+
+          <Togglable buttonLabel="new blog" ref={blogFormRef}>
+            <NewBlogForm flash={flash} setBlogs={setBlogs} toggleVisibility={toggleVisibility} />
+          </Togglable>
+
           <h2>blogs</h2>
           {blogs.map((blog) => (
             <Blog key={blog.id} blog={blog} />
           ))}
         </div>
       )}
-      {user && <NewBlogForm flash={flash} setBlogs={setBlogs} />}
     </div>
   );
 };

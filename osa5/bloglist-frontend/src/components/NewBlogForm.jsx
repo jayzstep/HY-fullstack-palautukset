@@ -2,7 +2,7 @@ import blogService from "../services/blogs";
 
 import { useState } from "react";
 
-const NewBlogForm = ({ flash, setBlogs }) => {
+const NewBlogForm = ({ flash, setBlogs, toggleVisibility }) => {
   const [title, setTitle] = useState("");
   const [author, setAuthor] = useState("");
   const [url, setUrl] = useState("");
@@ -11,8 +11,12 @@ const NewBlogForm = ({ flash, setBlogs }) => {
     event.preventDefault();
     try {
       const response = await blogService.create({ title, author, url });
+      toggleVisibility()
       let newBlog = { title: title, author: author, url: url, id: response.id };
       setBlogs((blogs) => [...blogs, newBlog]);
+      setTitle("")
+      setAuthor("")
+      setUrl("")
       let message = `${response.title} by ${response.author} created!`;
       flash(message);
     } catch (exception) {
