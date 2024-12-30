@@ -2,13 +2,10 @@ import { useState, useEffect } from "react";
 import Blog from "./components/Blog";
 import LoginForm from "./components/Loginform";
 import blogService from "./services/blogs";
-import loginService from "./services/login";
 
 const App = () => {
   const [blogs, setBlogs] = useState([]);
   const [message, setMessage] = useState(null);
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
   const [user, setUser] = useState(null);
   const [title, setTitle] = useState("");
   const [author, setAuthor] = useState("");
@@ -27,14 +24,6 @@ const App = () => {
     }
   }, []);
 
-  const handleUsernameChange = (event) => {
-    setUsername(event.target.value);
-  };
-
-  const handlePasswordChange = (event) => {
-    setPassword(event.target.value);
-  };
-
   const flash = (aMessage) => {
     setMessage(aMessage);
     setTimeout(() => {
@@ -42,19 +31,6 @@ const App = () => {
     }, 5000);
   };
 
-  const handleLogin = async (event) => {
-    event.preventDefault();
-    try {
-      const user = await loginService.login({ username, password });
-      window.localStorage.setItem("loggedBlogappUser", JSON.stringify(user));
-      blogService.setToken(user.token);
-      setUser(user);
-      setUsername("");
-      setPassword("");
-    } catch (exception) {
-      flash("wrong credentials");
-    }
-  };
   const handleCreate = async (event) => {
     event.preventDefault();
     try {
@@ -122,15 +98,7 @@ const App = () => {
     <div>
       <h1>BlogApp</h1>
       <Notification message={message} />
-      {!user && (
-        <LoginForm
-          handleLogin={handleLogin}
-          handleUsernameChange={handleUsernameChange}
-          handlePasswordChange={handlePasswordChange}
-          username={username}
-          password={password}
-        />
-      )}
+      {!user && <LoginForm flash={flash} setUser={setUser} />}
       {user && (
         <div>
           <p>{user.name} logged in</p>
