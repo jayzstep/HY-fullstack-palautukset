@@ -10,9 +10,10 @@ const NewBlogForm = ({ flash, setBlogs, toggleVisibility }) => {
   const handleCreate = async (event) => {
     event.preventDefault();
     try {
-      const response = await blogService.create({ title, author, url });
+      const likes = 0
+      const response = await blogService.create({ title, author, url, likes });
       toggleVisibility()
-      let newBlog = { title: title, author: author, url: url, id: response.id };
+      let newBlog = { title: title, author: author, url: url, id: response.id, likes: 0 };
       setBlogs((blogs) => [...blogs, newBlog]);
       setTitle("")
       setAuthor("")
