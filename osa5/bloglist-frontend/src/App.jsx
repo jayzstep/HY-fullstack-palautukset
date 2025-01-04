@@ -67,6 +67,14 @@ const App = () => {
     );
   };
 
+  const handleRemove = async (blog) => {
+    const id = blog.id;
+
+    await blogService.remove(id, blog);
+
+    setBlogs(blogs.filter((b) => b.id !== id));
+  };
+
   return (
     <div>
       <h1>BlogApp</h1>
@@ -94,7 +102,7 @@ const App = () => {
                 key={blog.id}
                 blog={blog}
                 handleLike={handleLike}
-                // handleRemove={handleRemove}
+                handleRemove={handleRemove}
               />
             ))}
         </div>

@@ -1,7 +1,6 @@
 import { useState } from "react";
 
-
-const Blog = ({ blog, handleLike }) => {
+const Blog = ({ blog, handleLike, handleRemove }) => {
   const [visible, setVisible] = useState(false);
   const blogStyle = {
     paddingTop: 10,
@@ -9,7 +8,7 @@ const Blog = ({ blog, handleLike }) => {
     border: "solid",
     borderWidth: 1,
     marginBottom: 5,
-    maxWidth: 200
+    maxWidth: 200,
   };
   const showDetails = { display: visible ? "" : "none" };
 
@@ -18,9 +17,16 @@ const Blog = ({ blog, handleLike }) => {
   };
 
   const updateLikes = (event) => {
-    event.preventDefault()
-    handleLike(blog)
-  }
+    event.preventDefault();
+    handleLike(blog);
+  };
+
+  const removeBlog = (event) => {
+    event.preventDefault();
+    if (window.confirm("Do you really want to remove ", blog.title)) {
+      handleRemove(blog);
+    }
+  };
 
   return (
     <div style={blogStyle}>
@@ -31,6 +37,7 @@ const Blog = ({ blog, handleLike }) => {
         <button onClick={updateLikes}>like</button>
         <p>{blog.url}</p>
         <p>{blog.user.name}</p>
+        <button onClick={removeBlog}>delete blog</button>
       </div>
       <button onClick={toggleVisibility}>{visible ? "hide" : "show"}</button>
     </div>
