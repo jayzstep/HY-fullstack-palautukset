@@ -10,7 +10,7 @@ const App = () => {
   const [alertMessage, setAlertMessage] = useState(null);
   const [user, setUser] = useState(null);
 
-  const blogFormRef = useRef()
+  const blogFormRef = useRef();
 
   useEffect(() => {
     blogService.getAll().then((blogs) => setBlogs(blogs));
@@ -33,19 +33,22 @@ const App = () => {
   };
 
   const handleLike = async (blog) => {
-    console.log('blog:', blog)
     const blogToUpdate = {
       title: blog.title,
       author: blog.author,
       url: blog.url,
-      likes : blog.likes + 1,
-      user: blog.user.id
-    }
+      likes: blog.likes + 1,
+      user: blog.user.id,
+    };
 
-    const updatedBlog = await blogService.update(blog.id, blogToUpdate)
+    const updatedBlog = await blogService.update(blog.id, blogToUpdate);
 
-    setBlogs(blogs.map(blog => blog.id !== updatedBlog.id ? blog : { ...blog, likes: blog.likes + 1 } ))
-  }
+    setBlogs(
+      blogs.map((blog) =>
+        blog.id !== updatedBlog.id ? blog : { ...blog, likes: blog.likes + 1 },
+      ),
+    );
+  };
 
   const handleLogout = async () => {
     window.localStorage.clear();
@@ -53,8 +56,8 @@ const App = () => {
   };
 
   const toggleVisibility = () => {
-    blogFormRef.current.toggleVisibility()
-  }
+    blogFormRef.current.toggleVisibility();
+  };
 
   const Notification = ({ message }) => {
     return (
@@ -75,13 +78,25 @@ const App = () => {
           <button onClick={handleLogout}>logout</button>
 
           <Togglable buttonLabel="new blog" ref={blogFormRef}>
-            <NewBlogForm flash={flash} setBlogs={setBlogs} toggleVisibility={toggleVisibility} />
+            <NewBlogForm
+              flash={flash}
+              setBlogs={setBlogs}
+              toggleVisibility={toggleVisibility}
+            />
           </Togglable>
 
           <h2>blogs</h2>
-          {blogs.map((blog) => (
-            <Blog key={blog.id} blog={blog} handleLike={handleLike} />
-          ))}
+          {blogs
+            .sort((a, b) => a.likes - b.likes)
+            .reverse()
+            .map((blog) => (
+              <Blog
+                key={blog.id}
+                blog={blog}
+                handleLike={handleLike}
+                // handleRemove={handleRemove}
+              />
+            ))}
         </div>
       )}
     </div>
