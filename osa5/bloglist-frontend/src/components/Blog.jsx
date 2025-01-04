@@ -32,7 +32,7 @@ const Blog = ({ blog, user, handleLike, handleRemove }) => {
     <div style={blogStyle}>
       <b>{blog.title}</b>
       <p>{blog.author}</p>
-      <div style={showDetails}>
+      <div style={showDetails} className="togglableContent">
         <p>likes: {blog.likes}</p>
         <button onClick={updateLikes}>like</button>
         <p>{blog.url}</p>
