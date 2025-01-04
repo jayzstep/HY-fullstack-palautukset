@@ -10,12 +10,12 @@ const setToken = newToken => {
 const getAll = async () => {
   const request = axios.get(baseUrl)
   const response = await request
-    return response.data
+  return response.data
 }
 
 const create = async newObject => {
   const config = {
-    headers: {Authorization: token},
+    headers: { Authorization: token },
   }
   const response = await axios.post(baseUrl, newObject, config)
   return response.data
@@ -31,7 +31,7 @@ const update = async (id, blogToUpdate) => {
 const remove = async (id, blog) => {
   const blogUrl = `${baseUrl}/${id}`
 
-  const response = await axios.delete(blogUrl, {data: blog})
+  const response = await axios.delete(blogUrl, { data: blog })
 
   return response.data
 }

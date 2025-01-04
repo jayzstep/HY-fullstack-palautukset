@@ -1,29 +1,29 @@
-import blogService from "../services/blogs";
+import blogService from '../services/blogs'
 
-import { useState } from "react";
+import { useState } from 'react'
 
 const NewBlogForm = ({ flash, setBlogs, toggleVisibility }) => {
-  const [title, setTitle] = useState("");
-  const [author, setAuthor] = useState("");
-  const [url, setUrl] = useState("");
+  const [title, setTitle] = useState('')
+  const [author, setAuthor] = useState('')
+  const [url, setUrl] = useState('')
 
   const handleCreate = async (event) => {
-    event.preventDefault();
+    event.preventDefault()
     try {
       const likes = 0
-      const response = await blogService.create({ title, author, url, likes });
+      const response = await blogService.create({ title, author, url, likes })
       toggleVisibility()
-      let newBlog = { title: title, author: author, url: url, id: response.id, likes: 0 };
-      setBlogs((blogs) => [...blogs, newBlog]);
-      setTitle("")
-      setAuthor("")
-      setUrl("")
-      let message = `${response.title} by ${response.author} created!`;
-      flash(message);
+      let newBlog = { title: title, author: author, url: url, id: response.id, likes: 0 }
+      setBlogs((blogs) => [...blogs, newBlog])
+      setTitle('')
+      setAuthor('')
+      setUrl('')
+      let message = `${response.title} by ${response.author} created!`
+      flash(message)
     } catch (exception) {
-      flash("error creating blog");
+      flash('error creating blog')
     }
-  };
+  }
 
   return (
     <div>
@@ -59,7 +59,7 @@ const NewBlogForm = ({ flash, setBlogs, toggleVisibility }) => {
         <button type="submit">Create</button>
       </form>
     </div>
-  );
-};
+  )
+}
 
-export default NewBlogForm;
+export default NewBlogForm
