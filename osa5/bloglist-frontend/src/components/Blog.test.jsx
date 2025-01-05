@@ -5,6 +5,9 @@ import Blog from './Blog'
 describe('<Blog />', () => {
   let container
 
+  const mockLikeHandler = vi.fn()
+  const mockHandleRemove = vi.fn()
+
   beforeEach(() => {
     const blog = {
       title: 'Logic course',
@@ -18,9 +21,6 @@ describe('<Blog />', () => {
       },
       id: '66a0b5ecf9f56572635f9256',
     }
-
-    const mockLikeHandler = vi.fn()
-    const mockHandleRemove = vi.fn()
 
     container = render(
       <Blog
@@ -45,5 +45,15 @@ describe('<Blog />', () => {
 
     const div = container.querySelector('.togglableContent')
     expect(div).not.toHaveStyle('display: none')
+  })
+
+  test('like handler is called when button is pressed', async () => {
+
+    const user = userEvent.setup()
+    const like = screen.getByText('like')
+    await user.click(like)
+    await user.click(like)
+
+    expect(mockLikeHandler.mock.calls).toHaveLength(2)
   })
 })
