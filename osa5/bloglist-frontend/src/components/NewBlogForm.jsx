@@ -2,7 +2,7 @@ import blogService from '../services/blogs'
 
 import { useState } from 'react'
 
-const NewBlogForm = ({ flash, setBlogs, toggleVisibility }) => {
+const NewBlogForm = ({ flash, setBlogs, toggleVisibility, user }) => {
   const [title, setTitle] = useState('')
   const [author, setAuthor] = useState('')
   const [url, setUrl] = useState('')
@@ -13,7 +13,7 @@ const NewBlogForm = ({ flash, setBlogs, toggleVisibility }) => {
       const likes = 0
       const response = await blogService.create({ title, author, url, likes })
       toggleVisibility()
-      let newBlog = { title: title, author: author, url: url, id: response.id, likes: 0 }
+      let newBlog = { title: title, author: author, url: url, likes: 0, user: { name: user.name } }
       setBlogs((blogs) => [...blogs, newBlog])
       setTitle('')
       setAuthor('')
@@ -25,6 +25,7 @@ const NewBlogForm = ({ flash, setBlogs, toggleVisibility }) => {
     }
   }
 
+
   return (
     <div>
       <h2>Create New Blog</h2>
@@ -35,6 +36,7 @@ const NewBlogForm = ({ flash, setBlogs, toggleVisibility }) => {
             type="text"
             value={title}
             name="Title"
+            placeholder="blog title"
             onChange={({ target }) => setTitle(target.value)}
           />
         </div>
@@ -44,6 +46,7 @@ const NewBlogForm = ({ flash, setBlogs, toggleVisibility }) => {
             type="text"
             value={author}
             name="Author"
+            placeholder="John Smith"
             onChange={({ target }) => setAuthor(target.value)}
           />
         </div>
@@ -53,6 +56,7 @@ const NewBlogForm = ({ flash, setBlogs, toggleVisibility }) => {
             type="text"
             value={url}
             name="Url"
+            placeholder="www.johnsmith.com"
             onChange={({ target }) => setUrl(target.value)}
           />
         </div>

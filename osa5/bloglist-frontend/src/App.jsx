@@ -90,6 +90,7 @@ const App = () => {
               flash={flash}
               setBlogs={setBlogs}
               toggleVisibility={toggleVisibility}
+              user={user}
             />
           </Togglable>
 
