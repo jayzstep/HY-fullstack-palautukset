@@ -75,6 +75,18 @@ const App = () => {
     setBlogs(blogs.filter((b) => b.id !== id))
   }
 
+  const handleCreate = async (blog) => {
+    try {
+      const response = await blogService.create(blog)
+      toggleVisibility()
+      setBlogs(blogs.concat({ ...response, user : { name: user.name, id: response.user } }))
+      let message = `${response.title} by ${response.author} created!`
+      flash(message)
+    } catch (exception) {
+      flash('error creating blog')
+    }
+  }
+
   return (
     <div>
       <h1>BlogApp</h1>
@@ -87,10 +99,8 @@ const App = () => {
 
           <Togglable buttonLabel="new blog" ref={blogFormRef}>
             <NewBlogForm
-              flash={flash}
-              setBlogs={setBlogs}
               toggleVisibility={toggleVisibility}
-              user={user}
+              handleCreate={handleCreate}
             />
           </Togglable>
 
