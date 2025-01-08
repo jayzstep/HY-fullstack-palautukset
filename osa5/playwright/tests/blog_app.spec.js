@@ -44,6 +44,13 @@ describe('Blog app', () => {
       await expect(page.getByTestId('blog-title')).toBeVisible()
   })
 
+  test('a blog can be liked', async ({ page }) => {
+      await createBlog(page, 'testiblogi', 'Jaakko Testi', 'www.testi.fi')
+      await page.getByRole('button', { name: 'show' }).click()
+      await page.getByRole('button', { name: 'like' }).click()
+      await expect(page.getByText('likes: 1')).toBeVisible()
+    })
+
 
 })
 })
