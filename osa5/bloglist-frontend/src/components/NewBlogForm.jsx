@@ -32,6 +32,7 @@ const NewBlogForm = ({  toggleVisibility, handleCreate }) => {
           <input
             type="text"
             value={title}
+            data-testid='title'
             name="Title"
             placeholder="blog title"
             onChange={({ target }) => setTitle(target.value)}
@@ -42,6 +43,7 @@ const NewBlogForm = ({  toggleVisibility, handleCreate }) => {
           <input
             type="text"
             value={author}
+            data-testid='author'
             name="Author"
             placeholder="John Smith"
             onChange={({ target }) => setAuthor(target.value)}
@@ -52,12 +54,13 @@ const NewBlogForm = ({  toggleVisibility, handleCreate }) => {
           <input
             type="text"
             value={url}
+            data-testid='url'
             name="Url"
             placeholder="www.johnsmith.com"
             onChange={({ target }) => setUrl(target.value)}
           />
         </div>
-        <button type="submit">Create</button>
+        <button type="submit" name="create">Create</button>
       </form>
     </div>
   )

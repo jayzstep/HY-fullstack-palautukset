@@ -30,7 +30,7 @@ const Blog = ({ blog, user, handleLike, handleRemove }) => {
 
   return (
     <div style={blogStyle}>
-      <b>{blog.title}</b>
+      <b data-testid='blog-title'>{blog.title}</b>
       <p>{blog.author}</p>
       <div style={showDetails} className="togglableContent">
         <p>likes: {blog.likes}</p>
