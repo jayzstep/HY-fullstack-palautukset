@@ -39,18 +39,29 @@ describe('Blog app', () => {
       await loginWith(page, 'merivja', 'salainen')
     })
 
-  test('a new blog can be created', async ({ page }) => {
+    test('a new blog can be created', async ({ page }) => {
       await createBlog(page, 'testiblogi', 'Jaakko Testi', 'www.testi.fi')
       await expect(page.getByTestId('blog-title')).toBeVisible()
-  })
+    })
 
-  test('a blog can be liked', async ({ page }) => {
+    test('a blog can be liked', async ({ page }) => {
       await createBlog(page, 'testiblogi', 'Jaakko Testi', 'www.testi.fi')
       await page.getByRole('button', { name: 'show' }).click()
       await page.getByRole('button', { name: 'like' }).click()
       await expect(page.getByText('likes: 1')).toBeVisible()
     })
 
+    test('a blog can be deleted', async ({ page }) => {
+      await createBlog(page, 'testiblogi', 'Jaakko Testi', 'www.testi.fi')
+
+      page.on('dialog', async dialog => {
+        await dialog.accept()
+      })
+
+      await page.getByRole('button', { name: 'show' }).click()
+      await page.getByRole('button', { name: 'delete blog' }).click()
+      await expect(page.getByTestId('blog-title')).not.toBeVisible()
+})
 
 })
 })

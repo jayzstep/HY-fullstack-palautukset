@@ -39,12 +39,14 @@ const tokenExtractor = (request, _response, next) => {
   const authorization = request.get('authorization')
   if (authorization && authorization.startsWith('Bearer ')) {
     request.token = authorization.replace('Bearer ', '')
+    logger.info('token begun with Bearer, token is: ', request.token)
   }
   next()
 }
 
 const userExtractor = async (request, response, next) => {
   if (!request.token) {
+    logger.error('no token found')
     next()
     return
   }
