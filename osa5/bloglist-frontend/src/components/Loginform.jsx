@@ -27,6 +27,7 @@ const LoginForm = ({ flash, setUser }) => {
           username
           <input
             type="text"
+            data-testid='username'
             value={username}
             name="Username"
             onChange={({ target }) => setUsername(target.value)}
@@ -37,6 +38,7 @@ const LoginForm = ({ flash, setUser }) => {
           <input
             type="password"
             value={password}
+            data-testid='password'
             name="Password"
             onChange={({ target }) => setPassword(target.value)}
           />

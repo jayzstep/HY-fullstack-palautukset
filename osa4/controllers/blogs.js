@@ -32,17 +32,37 @@ blogsRouter.post('/', async (request, response) => {
   }
 })
 
+// blogsRouter.delete('/:id', async (request, response) => {
+//   const id = request.params.id
+//   const user = request.user
+//   const blog = await Blog.findById(id)
+//   if (!blog) {
+//     return response.status(404).json({ error: 'Blog not found' })
+//   }
+//   if (blog.user.toString() !== user.id.toString()) {
+//     return response.status(403).json({ error: 'User id doesnt match' })
+//   }
+//   await Blog.findByIdAndDelete(id)
+//   response.status(204).end()
+// })
+
 blogsRouter.delete('/:id', async (request, response) => {
-  const id = request.params.id
-  const user = request.user
-  const blog = await Blog.findById(id)
-  if (!blog) {
-    return response.status(404).json({ error: 'Blog not found' })
+  const blogToDelete = await Blog.findById(request.params.id)
+  if (!blogToDelete) {
+    return response.status(204).end()
   }
-  if (blog.user.toString() !== user.id.toString()) {
-    return response.status(403).json({ error: 'User id doesnt match' })
+
+  if (
+    blogToDelete.user &&
+    blogToDelete.user.toString() !== request.body.user.id
+  ) {
+    return response.status(401).json({
+      error: 'only the creator can delete a blog'
+    })
   }
-  await Blog.findByIdAndDelete(id)
+
+  await Blog.findByIdAndDelete(request.params.id)
+
   response.status(204).end()
 })
 
