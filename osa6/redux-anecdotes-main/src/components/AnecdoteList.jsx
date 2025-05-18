@@ -6,7 +6,8 @@ const AnecdoteList = () => {
     if (filter === "") {
       return anecdotes;
     }
-    return anecdotes.filter((anecdote) => anecdote.content.toLowerCase().includes(filter.filter.toLowerCase()));
+    console.log('Anecdotes: ', anecdotes)
+    return anecdotes.filter((anecdote) => anecdote.content.toLowerCase().includes(filter.toLowerCase()));
   });
   const dispatch = useDispatch();
 
@@ -17,7 +18,7 @@ const AnecdoteList = () => {
 
   return (
     <div>
-      {anecdotes
+      {[...anecdotes]
         .sort((a, b) => a.votes - b.votes)
         .reverse()
         .map((anecdote) => (
