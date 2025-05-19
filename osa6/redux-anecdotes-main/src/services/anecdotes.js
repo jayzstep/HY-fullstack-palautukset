@@ -1,6 +1,5 @@
 import axios from "axios";
-import { asObject } from "../reducers/anecdoteReducer";
-
+import { asObject, setAnecdotes } from "../reducers/anecdoteReducer";
 const baseUrl = "http://localhost:3001/anecdotes";
 
 const getAll = async () => {
