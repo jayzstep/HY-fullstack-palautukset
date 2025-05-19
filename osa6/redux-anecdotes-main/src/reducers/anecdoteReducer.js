@@ -50,3 +50,10 @@ export const addAnecdote = (content) => {
     dispatch(newAnecdote(content))
   }
 }
+
+export const addVoteForAnecdote = (id) => {
+  return async dispatch => {
+    await anecdoteService.voteAnecdote(id)
+    dispatch(voteFor(id))
+  }
+}
