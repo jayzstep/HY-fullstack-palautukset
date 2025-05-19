@@ -20,7 +20,6 @@ const asObject = (anecdote) => {
 };
 
 const initialState = anecdotesAtStart.map(asObject);
-console.log("Initial state: ", initialState);
 
 const anecdoteSlice = createSlice({
   name: "anecdotes",
