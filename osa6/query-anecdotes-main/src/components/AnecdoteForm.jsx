@@ -5,12 +5,19 @@ import { useContext } from "react";
 
 const AnecdoteForm = () => {
   const queryClient = useQueryClient();
-  const [notification, dispatch] = useContext(NotificationContext)
+  const [notification, dispatch] = useContext(NotificationContext);
 
   const newAnecdoteMutation = useMutation({
     mutationFn: createAnecdote,
-    onSuccess: () => {
+    onSuccess: (data, variables) => {
       queryClient.invalidateQueries({ queryKey: ["anecdotes"] });
+      dispatch({ type: "SET_NOTIFICATION", payload: `You added ${variables}` });
+    },
+    onError: () => {
+      dispatch({
+        type: "SET_NOTIFICATION",
+        payload: "too short anecdote, must have length 5 or more",
+      });
     },
   });
 
@@ -19,7 +26,6 @@ const AnecdoteForm = () => {
     const content = event.target.anecdote.value;
     event.target.anecdote.value = "";
     newAnecdoteMutation.mutate(content);
-    dispatch({type:"SET_NOTIFICATION", payload: `You added ${content}`})
   };
 
   return (

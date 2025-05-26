@@ -3,7 +3,7 @@
     {
       "content": "If it hurts, do it more often",
       "id": "47145",
-      "votes": 7
+      "votes": 8
     },
     {
       "content": "Adding manpower to a late software project makes it later!",
@@ -32,28 +32,8 @@
     },
     {
       "content": "Refactoring is important.",
-      "id": "97451",
-      "votes": 0
-    },
-    {
-      "content": "Clean code is impossible.",
-      "id": "47577",
-      "votes": 0
-    },
-    {
-      "content": "React is sometimes annoying",
-      "id": "94963",
+      "id": "48067",
       "votes": 1
-    },
-    {
-      "content": "Windows installs a lot of extra stuff",
-      "id": "90503",
-      "votes": 0
-    },
-    {
-      "content": "Customer is sometimes right.",
-      "id": "1197",
-      "votes": 0
     }
   ]
 }
