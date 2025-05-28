@@ -5,6 +5,7 @@ import {
   Route,
   Routes,
   useMatch,
+  useNavigate
 } from "react-router-dom";
 
 const Menu = () => {
@@ -133,7 +134,15 @@ const Anecdote = ({anecdote}) => {
   );
 };
 
+const Notification = ({notification}) => {
+  return (
+  <div>
+      {notification}
+    </div>
+  )
+}
 const App = () => {
+  const navigate = useNavigate()
   const [anecdotes, setAnecdotes] = useState([
     {
       content: "If it hurts, do it more often",
@@ -156,6 +165,9 @@ const App = () => {
   const addNew = (anecdote) => {
     anecdote.id = Math.round(Math.random() * 10000);
     setAnecdotes(anecdotes.concat(anecdote));
+    setNotification(`a new anecdote ${anecdote.content} created!`)
+    navigate('/')
+    setTimeout(() => setNotification(""), 5000)
   };
 
   const anecdoteById = (id) => anecdotes.find((a) => a.id === id);
@@ -174,10 +186,12 @@ const App = () => {
   const match = useMatch("/anecdotes/:id");
   const anecdote = match ? anecdoteById(Number(match.params.id)) : null;
 
+
   return (
     <div>
       <h1>Software anecdotes</h1>
       <Menu />
+      <Notification notification={notification}/>
       <Routes>
         <Route path="/" element={<AnecdoteList anecdotes={anecdotes} />} />
         <Route path="/about" element={<About />} />
