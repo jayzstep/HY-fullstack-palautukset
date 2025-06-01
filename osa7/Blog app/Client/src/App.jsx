@@ -1,14 +1,17 @@
-import { useState, useEffect, useRef } from 'react'
+import { useContext, useEffect, useRef, useState } from 'react'
 import Blog from './components/Blog'
 import LoginForm from './components/Loginform'
 import NewBlogForm from './components/NewBlogForm'
 import blogService from './services/blogs'
 import Togglable from './components/Togglable'
+import NotificationContext from './NotificationContext'
+import { Notification } from './components/Notification'
 
 const App = () => {
   const [blogs, setBlogs] = useState([])
   const [alertMessage, setAlertMessage] = useState(null)
   const [user, setUser] = useState(null)
+  const [notification, notificationDispatch] = useContext(NotificationContext)
 
   const blogFormRef = useRef()
 
@@ -25,12 +28,6 @@ const App = () => {
     }
   }, [])
 
-  const flash = (aMessage) => {
-    setAlertMessage(aMessage)
-    setTimeout(() => {
-      setAlertMessage(null)
-    }, 5000)
-  }
 
   const handleLike = async (blog) => {
     const blogToUpdate = {
@@ -59,14 +56,6 @@ const App = () => {
     blogFormRef.current.toggleVisibility()
   }
 
-  const Notification = ({ message }) => {
-    return (
-      <div>
-        <h3>{message}</h3>
-      </div>
-    )
-  }
-
   const handleRemove = async (blog) => {
     const id = blog.id
 
@@ -79,19 +68,24 @@ const App = () => {
     try {
       const response = await blogService.create(blog)
       toggleVisibility()
-      setBlogs(blogs.concat({ ...response, user : { name: user.name, id: response.user } }))
+      setBlogs(
+        blogs.concat({
+          ...response,
+          user: { name: user.name, id: response.user },
+        }),
+      )
       let message = `${response.title} by ${response.author} created!`
-      flash(message)
+      notificationDispatch({ type: 'SET', payload: message })
     } catch (exception) {
-      flash('error creating blog')
+      notificationDispatch({ type: 'SET', payload: 'error creating blog' })
     }
   }
 
   return (
     <div>
       <h1>BlogApp</h1>
-      <Notification message={alertMessage} />
-      {!user && <LoginForm flash={flash} setUser={setUser} />}
+      <Notification />
+      {!user && <LoginForm setUser={setUser} />}
       {user && (
         <div>
           <p>{user.name} logged in</p>

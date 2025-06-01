@@ -1,10 +1,14 @@
+import { useContext } from 'react'
 import loginService from '../services/login'
 import blogService from '../services/blogs'
 import { useState } from 'react'
+import NotificationContext from '../NotificationContext'
 
-const LoginForm = ({ flash, setUser }) => {
+const LoginForm = ({ setUser }) => {
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
+
+  const [notification, notificationDispatch] = useContext(NotificationContext)
 
   const handleLogin = async (event) => {
     event.preventDefault()
@@ -15,8 +19,10 @@ const LoginForm = ({ flash, setUser }) => {
       setUser(user)
       setUsername('')
       setPassword('')
+      notificationDispatch({ type: 'SET', payload: 'Welcome!' })
     } catch (exception) {
-      flash('wrong credentials')
+      const message = 'wrong credentials'
+      notificationDispatch({ type: 'SET', payload: message })
     }
   }
   return (
@@ -27,7 +33,7 @@ const LoginForm = ({ flash, setUser }) => {
           username
           <input
             type="text"
-            data-testid='username'
+            data-testid="username"
             value={username}
             name="Username"
             onChange={({ target }) => setUsername(target.value)}
@@ -38,7 +44,7 @@ const LoginForm = ({ flash, setUser }) => {
           <input
             type="password"
             value={password}
-            data-testid='password'
+            data-testid="password"
             name="Password"
             onChange={({ target }) => setPassword(target.value)}
           />
