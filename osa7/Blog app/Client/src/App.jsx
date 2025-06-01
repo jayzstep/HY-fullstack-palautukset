@@ -28,6 +28,20 @@ const App = () => {
     },
   })
 
+  const updateBlogMutation = useMutation({
+    mutationFn: (params) => blogService.update(params.id, params.blog),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ querykey: ['blogs'] })
+    },
+  })
+
+  const removeBlogMutation = useMutation({
+    mutationFn: blogService.remove,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ querykey: ['blogs'] })
+    }
+  })
+
   useEffect(() => {
     const loggedUserJSON = window.localStorage.getItem('loggedBlogappUser')
     if (loggedUserJSON) {
@@ -43,7 +57,7 @@ const App = () => {
 
   const blogs = blogsQuery.data
 
-  const handleLike = async (blog) => {
+  const handleLike = (blog) => {
     const blogToUpdate = {
       title: blog.title,
       author: blog.author,
@@ -52,14 +66,7 @@ const App = () => {
       user: blog.user.id,
     }
 
-    const updatedBlog = await blogService.update(blog.id, blogToUpdate)
-
-    console.log('blog to be updated: ', updatedBlog)
-    // setBlogs(
-    //   blogs.map((blog) =>
-    //     blog.id !== updatedBlog.id ? blog : { ...blog, likes: blog.likes + 1 },
-    //   ),
-    // )
+    updateBlogMutation.mutate({ id: blog.id, blog: blogToUpdate })
   }
 
   const handleLogout = async () => {
@@ -71,15 +78,12 @@ const App = () => {
     blogFormRef.current.toggleVisibility()
   }
 
-  const handleRemove = async (blog) => {
-    const id = blog.id
+  const handleRemove = (blog) => {
+    removeBlogMutation.mutate(blog.id)
 
-    await blogService.remove(id, blog)
-
-    setBlogs(blogs.filter((b) => b.id !== id))
   }
 
-  const handleCreate = async (blog) => {
+  const handleCreate = (blog) => {
     try {
       newBlogMutation.mutate(blog)
       toggleVisibility()
