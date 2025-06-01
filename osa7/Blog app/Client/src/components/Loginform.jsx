@@ -3,20 +3,23 @@ import loginService from '../services/login'
 import blogService from '../services/blogs'
 import { useState } from 'react'
 import NotificationContext from '../NotificationContext'
+import UserContext from '../UserContext'
 
 const LoginForm = ({ setUser }) => {
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
 
   const [notification, notificationDispatch] = useContext(NotificationContext)
+  const [user, userDispatch] = useContext(UserContext)
 
   const handleLogin = async (event) => {
     event.preventDefault()
     try {
-      const user = await loginService.login({ username, password })
-      window.localStorage.setItem('loggedBlogappUser', JSON.stringify(user))
-      blogService.setToken(user.token)
-      setUser(user)
+      const loggedInUser = await loginService.login({ username, password })
+      window.localStorage.setItem('loggedBlogappUser', JSON.stringify(loggedInUser))
+      blogService.setToken(loggedInUser.token)
+      // setUser(user)
+      userDispatch({type: 'SET', payload: loggedInUser})
       setUsername('')
       setPassword('')
       notificationDispatch({ type: 'SET', payload: 'Welcome!' })

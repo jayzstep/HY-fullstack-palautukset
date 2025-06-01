@@ -7,12 +7,14 @@ import Togglable from './components/Togglable'
 import NotificationContext from './NotificationContext'
 import { Notification } from './components/Notification'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import UserContext from './UserContext'
 
 const App = () => {
   const queryClient = useQueryClient()
-  const [user, setUser] = useState(null)
+  // const [user, setUser] = useState(null)
 
   const [notification, notificationDispatch] = useContext(NotificationContext)
+  const [user, userDispatch] = useContext(UserContext)
 
   const blogFormRef = useRef()
 
@@ -46,7 +48,8 @@ const App = () => {
     const loggedUserJSON = window.localStorage.getItem('loggedBlogappUser')
     if (loggedUserJSON) {
       const user = JSON.parse(loggedUserJSON)
-      setUser(user)
+      // setUser(user)
+      userDispatch({type: 'SET', payload: user})
       blogService.setToken(user.token)
     }
   }, [])
@@ -71,7 +74,8 @@ const App = () => {
 
   const handleLogout = async () => {
     window.localStorage.clear()
-    setUser(null)
+    // setUser(null)
+    userDispatch({type: 'CLEAR'})
   }
 
   const toggleVisibility = () => {
@@ -98,7 +102,7 @@ const App = () => {
     <div>
       <h1>BlogApp</h1>
       <Notification />
-      {!user && <LoginForm setUser={setUser} />}
+      {!user && <LoginForm />}
       {user && (
         <div>
           <p>{user.name} logged in</p>
