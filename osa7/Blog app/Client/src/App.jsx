@@ -6,18 +6,25 @@ import blogService from './services/blogs'
 import Togglable from './components/Togglable'
 import NotificationContext from './NotificationContext'
 import { Notification } from './components/Notification'
+import { useQuery } from '@tanstack/react-query'
 
 const App = () => {
-  const [blogs, setBlogs] = useState([])
+  // const [blogs, setBlogs] = useState([])
   const [alertMessage, setAlertMessage] = useState(null)
   const [user, setUser] = useState(null)
   const [notification, notificationDispatch] = useContext(NotificationContext)
 
   const blogFormRef = useRef()
 
-  useEffect(() => {
-    blogService.getAll().then((blogs) => setBlogs(blogs))
-  }, [])
+  const zzzblogs = useQuery({
+    queryKey: ['blogs'],
+    queryFn: blogService.getAll
+  })
+
+
+  // useEffect(() => {
+  //   blogService.getAll().then((blogs) => setBlogs(blogs))
+  // }, [])
 
   useEffect(() => {
     const loggedUserJSON = window.localStorage.getItem('loggedBlogappUser')
@@ -28,6 +35,11 @@ const App = () => {
     }
   }, [])
 
+  if (zzzblogs.isLoading) {
+    return <div>loading data...</div>
+  }
+
+  const blogs = zzzblogs.data
 
   const handleLike = async (blog) => {
     const blogToUpdate = {
@@ -40,11 +52,12 @@ const App = () => {
 
     const updatedBlog = await blogService.update(blog.id, blogToUpdate)
 
-    setBlogs(
-      blogs.map((blog) =>
-        blog.id !== updatedBlog.id ? blog : { ...blog, likes: blog.likes + 1 },
-      ),
-    )
+    console.log('blog to be updated: ', updatedBlog)
+    // setBlogs(
+    //   blogs.map((blog) =>
+    //     blog.id !== updatedBlog.id ? blog : { ...blog, likes: blog.likes + 1 },
+    //   ),
+    // )
   }
 
   const handleLogout = async () => {
