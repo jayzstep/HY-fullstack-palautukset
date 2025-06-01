@@ -6,25 +6,27 @@ import blogService from './services/blogs'
 import Togglable from './components/Togglable'
 import NotificationContext from './NotificationContext'
 import { Notification } from './components/Notification'
-import { useQuery } from '@tanstack/react-query'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 
 const App = () => {
-  // const [blogs, setBlogs] = useState([])
-  const [alertMessage, setAlertMessage] = useState(null)
+  const queryClient = useQueryClient()
   const [user, setUser] = useState(null)
+
   const [notification, notificationDispatch] = useContext(NotificationContext)
 
   const blogFormRef = useRef()
 
-  const zzzblogs = useQuery({
+  const blogsQuery = useQuery({
     queryKey: ['blogs'],
-    queryFn: blogService.getAll
+    queryFn: blogService.getAll,
   })
 
-
-  // useEffect(() => {
-  //   blogService.getAll().then((blogs) => setBlogs(blogs))
-  // }, [])
+  const newBlogMutation = useMutation({
+    mutationFn: blogService.create,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ querykey: ['blogs'] })
+    },
+  })
 
   useEffect(() => {
     const loggedUserJSON = window.localStorage.getItem('loggedBlogappUser')
@@ -35,11 +37,11 @@ const App = () => {
     }
   }, [])
 
-  if (zzzblogs.isLoading) {
+  if (blogsQuery.isLoading) {
     return <div>loading data...</div>
   }
 
-  const blogs = zzzblogs.data
+  const blogs = blogsQuery.data
 
   const handleLike = async (blog) => {
     const blogToUpdate = {
@@ -79,15 +81,9 @@ const App = () => {
 
   const handleCreate = async (blog) => {
     try {
-      const response = await blogService.create(blog)
+      newBlogMutation.mutate(blog)
       toggleVisibility()
-      setBlogs(
-        blogs.concat({
-          ...response,
-          user: { name: user.name, id: response.user },
-        }),
-      )
-      let message = `${response.title} by ${response.author} created!`
+      const message = `${blog.title} by ${blog.author} created!`
       notificationDispatch({ type: 'SET', payload: message })
     } catch (exception) {
       notificationDispatch({ type: 'SET', payload: 'error creating blog' })
