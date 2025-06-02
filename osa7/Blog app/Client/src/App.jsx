@@ -2,6 +2,7 @@ import { useContext, useEffect, useRef, useState } from 'react'
 import Blog from './components/Blog'
 import LoginForm from './components/Loginform'
 import Users from './components/Users'
+import User from './components/User'
 import NewBlogForm from './components/NewBlogForm'
 import blogService from './services/blogs'
 import Togglable from './components/Togglable'
@@ -97,40 +98,44 @@ const App = () => {
   }
 
   return (
-    <div>
-      <h1>BlogApp</h1>
-      <Notification />
-      {!user && <LoginForm />}
-      {user && (
-        <div>
-          <p>{user.name} logged in</p>
-          <button onClick={handleLogout}>logout</button>
+    <Router>
+      <div>
+        <h1>BlogApp</h1>
+        <Notification />
+        {!user && <LoginForm />}
+        {user && (
+          <div>
+            <p>{user.name} logged in</p>
+            <button onClick={handleLogout}>logout</button>
 
-          <Togglable buttonLabel="new blog" ref={blogFormRef}>
-            <NewBlogForm
-              toggleVisibility={toggleVisibility}
-              handleCreate={handleCreate}
-            />
-          </Togglable>
-
-          <Users />
-
-          <h2>blogs</h2>
-          {blogs
-            .sort((a, b) => a.likes - b.likes)
-            .reverse()
-            .map((blog) => (
-              <Blog
-                key={blog.id}
-                blog={blog}
-                user={user}
-                handleLike={handleLike}
-                handleRemove={handleRemove}
+            <Togglable buttonLabel="new blog" ref={blogFormRef}>
+              <NewBlogForm
+                toggleVisibility={toggleVisibility}
+                handleCreate={handleCreate}
               />
-            ))}
-        </div>
-      )}
-    </div>
+            </Togglable>
+            <Routes>
+              <Route path ='/users' element={<Users />} />
+              <Route path ='/users/:id' element={<User />} />
+            </Routes>
+
+            <h2>Blogs</h2>
+            {blogs
+              .sort((a, b) => a.likes - b.likes)
+              .reverse()
+              .map((blog) => (
+                <Blog
+                  key={blog.id}
+                  blog={blog}
+                  user={user}
+                  handleLike={handleLike}
+                  handleRemove={handleRemove}
+                />
+              ))}
+          </div>
+        )}
+      </div>
+    </Router>
   )
 }
 
