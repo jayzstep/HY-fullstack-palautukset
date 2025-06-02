@@ -10,11 +10,7 @@ import NotificationContext from './NotificationContext'
 import { Notification } from './components/Notification'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import UserContext from './UserContext'
-import {
-  Route,
-  Routes,
-  useNavigate,
-} from 'react-router-dom'
+import { Link, Route, Routes, useNavigate } from 'react-router-dom'
 import Bloglist from './components/BlogList.jsx'
 
 const App = () => {
@@ -105,15 +101,25 @@ const App = () => {
     }
   }
 
+  const navStyle = {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '1rem'
+  }
+
   return (
     <div>
-      <h1>BlogApp</h1>
       <Notification />
       {!user && <LoginForm />}
       {user && (
         <div>
-          <p>{user.name} logged in</p>
-          <button onClick={handleLogout}>logout</button>
+          <nav style={navStyle}>
+            <Link to="/">Blogs</Link>
+            <Link to="/users">Users</Link>
+            <p>{user.name} logged in</p>
+            <button onClick={handleLogout}>logout</button>
+          </nav>
+          <h1>BlogApp</h1>
 
           <Togglable buttonLabel="new blog" ref={blogFormRef}>
             <NewBlogForm
