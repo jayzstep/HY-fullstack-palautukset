@@ -1,20 +1,20 @@
-import { useState } from 'react'
+import blogService from '../services/blogs'
+import { useQuery } from '@tanstack/react-query'
+import { useParams } from 'react-router-dom'
 
-const Blog = ({ blog, user, handleLike, handleRemove }) => {
-  const [visible, setVisible] = useState(false)
-  const blogStyle = {
-    paddingTop: 10,
-    paddingLeft: 2,
-    border: 'solid',
-    borderWidth: 1,
-    marginBottom: 5,
-    maxWidth: 200,
-  }
-  const showDetails = { display: visible ? '' : 'none' }
+const Blog = ({ user, handleLike, handleRemove }) => {
+  const id = useParams().id
 
-  const toggleVisibility = () => {
-    setVisible(!visible)
+  const blogsQuery = useQuery({
+    queryKey: ['blogs'],
+    queryFn: blogService.getAll,
+  })
+
+  if (blogsQuery.isLoading) {
+    return <div>loading data...</div>
   }
+  const blog = blogsQuery.data.find((b) => b.id === id)
+
 
   const updateLikes = (event) => {
     event.preventDefault()
@@ -29,17 +29,17 @@ const Blog = ({ blog, user, handleLike, handleRemove }) => {
   }
 
   return (
-    <div style={blogStyle}>
-      <b data-testid='blog-title'>{blog.title}</b>
-      <p>{blog.author}</p>
-      <div style={showDetails} className="togglableContent">
-        <p>likes: {blog.likes}</p>
-        <button onClick={updateLikes}>like</button>
-        <p>{blog.url}</p>
-        <p>{blog.user.name}</p>
-        {blog.user.name === user.name && <button onClick={removeBlog}>delete blog</button>}
-      </div>
-      <button onClick={toggleVisibility}>{visible ? 'hide' : 'show'}</button>
+    <div>
+      <h2>
+        {blog.title} {blog.author}
+      </h2>
+      <a href={blog.url}>{blog.url}</a>
+      <p>{blog.likes} likes</p>
+      <button onClick={updateLikes}>like</button>
+      {blog.user.name === user.name && (
+        <button onClick={removeBlog}>delete blog</button>
+      )}
+      <p>added by {blog.user.name}</p>
     </div>
   )
 }

@@ -1,4 +1,4 @@
-import { useContext, useEffect, useRef, useState } from 'react'
+import { useContext, useEffect, useRef } from 'react'
 import Blog from './components/Blog'
 import LoginForm from './components/Loginform'
 import Users from './components/Users'
@@ -10,10 +10,16 @@ import NotificationContext from './NotificationContext'
 import { Notification } from './components/Notification'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import UserContext from './UserContext'
-import { BrowserRouter as Router, Link, Route, Routes } from 'react-router-dom'
+import {
+  Route,
+  Routes,
+  useNavigate,
+} from 'react-router-dom'
+import Bloglist from './components/BlogList.jsx'
 
 const App = () => {
   const queryClient = useQueryClient()
+  const navigate = useNavigate()
 
   const [notification, notificationDispatch] = useContext(NotificationContext)
   const [user, userDispatch] = useContext(UserContext)
@@ -84,6 +90,8 @@ const App = () => {
 
   const handleRemove = (blog) => {
     removeBlogMutation.mutate(blog.id)
+    notificationDispatch({ type: 'SET', payload: 'blog removed' })
+    navigate('/')
   }
 
   const handleCreate = (blog) => {
@@ -98,44 +106,39 @@ const App = () => {
   }
 
   return (
-    <Router>
-      <div>
-        <h1>BlogApp</h1>
-        <Notification />
-        {!user && <LoginForm />}
-        {user && (
-          <div>
-            <p>{user.name} logged in</p>
-            <button onClick={handleLogout}>logout</button>
+    <div>
+      <h1>BlogApp</h1>
+      <Notification />
+      {!user && <LoginForm />}
+      {user && (
+        <div>
+          <p>{user.name} logged in</p>
+          <button onClick={handleLogout}>logout</button>
 
-            <Togglable buttonLabel="new blog" ref={blogFormRef}>
-              <NewBlogForm
-                toggleVisibility={toggleVisibility}
-                handleCreate={handleCreate}
-              />
-            </Togglable>
-            <Routes>
-              <Route path ='/users' element={<Users />} />
-              <Route path ='/users/:id' element={<User />} />
-            </Routes>
-
-            <h2>Blogs</h2>
-            {blogs
-              .sort((a, b) => a.likes - b.likes)
-              .reverse()
-              .map((blog) => (
+          <Togglable buttonLabel="new blog" ref={blogFormRef}>
+            <NewBlogForm
+              toggleVisibility={toggleVisibility}
+              handleCreate={handleCreate}
+            />
+          </Togglable>
+          <Routes>
+            <Route path="/users" element={<Users />} />
+            <Route path="/users/:id" element={<User />} />
+            <Route path="/" element={<Bloglist />} />
+            <Route
+              path="/blogs/:id"
+              element={
                 <Blog
-                  key={blog.id}
-                  blog={blog}
                   user={user}
                   handleLike={handleLike}
                   handleRemove={handleRemove}
                 />
-              ))}
-          </div>
-        )}
-      </div>
-    </Router>
+              }
+            />
+          </Routes>
+        </div>
+      )}
+    </div>
   )
 }
 
