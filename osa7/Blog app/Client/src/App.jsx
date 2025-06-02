@@ -1,6 +1,7 @@
 import { useContext, useEffect, useRef, useState } from 'react'
 import Blog from './components/Blog'
 import LoginForm from './components/Loginform'
+import Users from './components/Users'
 import NewBlogForm from './components/NewBlogForm'
 import blogService from './services/blogs'
 import Togglable from './components/Togglable'
@@ -8,10 +9,10 @@ import NotificationContext from './NotificationContext'
 import { Notification } from './components/Notification'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import UserContext from './UserContext'
+import { BrowserRouter as Router, Link, Route, Routes } from 'react-router-dom'
 
 const App = () => {
   const queryClient = useQueryClient()
-  // const [user, setUser] = useState(null)
 
   const [notification, notificationDispatch] = useContext(NotificationContext)
   const [user, userDispatch] = useContext(UserContext)
@@ -41,15 +42,14 @@ const App = () => {
     mutationFn: blogService.remove,
     onSuccess: () => {
       queryClient.invalidateQueries({ querykey: ['blogs'] })
-    }
+    },
   })
 
   useEffect(() => {
     const loggedUserJSON = window.localStorage.getItem('loggedBlogappUser')
     if (loggedUserJSON) {
       const user = JSON.parse(loggedUserJSON)
-      // setUser(user)
-      userDispatch({type: 'SET', payload: user})
+      userDispatch({ type: 'SET', payload: user })
       blogService.setToken(user.token)
     }
   }, [])
@@ -74,8 +74,7 @@ const App = () => {
 
   const handleLogout = async () => {
     window.localStorage.clear()
-    // setUser(null)
-    userDispatch({type: 'CLEAR'})
+    userDispatch({ type: 'CLEAR' })
   }
 
   const toggleVisibility = () => {
@@ -84,7 +83,6 @@ const App = () => {
 
   const handleRemove = (blog) => {
     removeBlogMutation.mutate(blog.id)
-
   }
 
   const handleCreate = (blog) => {
@@ -114,6 +112,8 @@ const App = () => {
               handleCreate={handleCreate}
             />
           </Togglable>
+
+          <Users />
 
           <h2>blogs</h2>
           {blogs
