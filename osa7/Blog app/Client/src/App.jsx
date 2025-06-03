@@ -12,6 +12,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import UserContext from './UserContext'
 import { Link, Route, Routes, useNavigate } from 'react-router-dom'
 import Bloglist from './components/BlogList.jsx'
+import { Toolbar, AppBar, Button } from '@mui/material'
 
 const App = () => {
   const queryClient = useQueryClient()
@@ -113,12 +114,18 @@ const App = () => {
       {!user && <LoginForm />}
       {user && (
         <div>
-          <nav style={navStyle}>
-            <Link to="/">Blogs</Link>
-            <Link to="/users">Users</Link>
-            <p>{user.name} logged in</p>
-            <button onClick={handleLogout}>logout</button>
-          </nav>
+          <AppBar position="static">
+            <Toolbar>
+              <Button color="inherit" component={Link} to="/">
+                Blogs
+              </Button>
+              <Button color="inherit" component={Link} to="/users">
+                Users
+              </Button>
+              <em>{user.name} logged in</em>
+              <Button color="inherit" onClick={handleLogout}>logout</Button>
+            </Toolbar>
+          </AppBar>
           <h1>BlogApp</h1>
 
           <Togglable buttonLabel="new blog" ref={blogFormRef}>

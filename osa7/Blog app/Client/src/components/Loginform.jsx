@@ -4,6 +4,7 @@ import blogService from '../services/blogs'
 import { useState } from 'react'
 import NotificationContext from '../NotificationContext'
 import UserContext from '../UserContext'
+import { TextField, Button } from '@mui/material'
 
 const LoginForm = ({ setUser }) => {
   const [username, setUsername] = useState('')
@@ -16,10 +17,12 @@ const LoginForm = ({ setUser }) => {
     event.preventDefault()
     try {
       const loggedInUser = await loginService.login({ username, password })
-      window.localStorage.setItem('loggedBlogappUser', JSON.stringify(loggedInUser))
+      window.localStorage.setItem(
+        'loggedBlogappUser',
+        JSON.stringify(loggedInUser),
+      )
       blogService.setToken(loggedInUser.token)
-      // setUser(user)
-      userDispatch({type: 'SET', payload: loggedInUser})
+      userDispatch({ type: 'SET', payload: loggedInUser })
       setUsername('')
       setPassword('')
       notificationDispatch({ type: 'SET', payload: 'Welcome!' })
@@ -33,26 +36,24 @@ const LoginForm = ({ setUser }) => {
       <h2>Login</h2>
       <form onSubmit={handleLogin}>
         <div>
-          username
-          <input
-            type="text"
-            data-testid="username"
+          <TextField
+            label="username"
             value={username}
+            onChange={(event) => setUsername(event.target.value)}
             name="Username"
-            onChange={({ target }) => setUsername(target.value)}
           />
         </div>
         <div>
-          password
-          <input
+          <TextField
+            label="password"
             type="password"
             value={password}
             data-testid="password"
             name="Password"
-            onChange={({ target }) => setPassword(target.value)}
+            onChange={(event) => setPassword(event.target.value)}
           />
         </div>
-        <button type="submit">Login</button>
+        <Button variant="contained" color="primary" type="submit">Login</Button>
       </form>
     </div>
   )

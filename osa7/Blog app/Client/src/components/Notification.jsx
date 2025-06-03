@@ -1,5 +1,6 @@
 import { useContext } from 'react'
 import NotificationContext from '../NotificationContext'
+import { Alert } from '@mui/material'
 
 export const Notification = () => {
   const [notification, dispatch] = useContext(NotificationContext)
@@ -10,7 +11,9 @@ export const Notification = () => {
 
   return (
     <div>
-      <h3>{notification}</h3>
+      <Alert severity="success">
+        {notification}
+      </Alert>
     </div>
   )
 }

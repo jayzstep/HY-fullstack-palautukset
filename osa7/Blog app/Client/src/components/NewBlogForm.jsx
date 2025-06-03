@@ -1,4 +1,4 @@
-import blogService from '../services/blogs'
+import { TextField, Button } from '@mui/material'
 
 import { useState } from 'react'
 
@@ -28,39 +28,33 @@ const NewBlogForm = ({  toggleVisibility, handleCreate }) => {
       <h2>Create New Blog</h2>
       <form onSubmit={addBlog}>
         <div>
-          title
-          <input
-            type="text"
+          <TextField
+            label="Title"
             value={title}
-            data-testid='title'
             name="Title"
             placeholder="blog title"
-            onChange={({ target }) => setTitle(target.value)}
+            onChange={(event) => setTitle(event.target.value)}
           />
         </div>
         <div>
-          author
-          <input
-            type="text"
+          <TextField
+            label="Author"
             value={author}
-            data-testid='author'
             name="Author"
             placeholder="John Smith"
-            onChange={({ target }) => setAuthor(target.value)}
+            onChange={(event) => setAuthor(event.target.value)}
           />
         </div>
         <div>
-          url
-          <input
-            type="text"
+          <TextField
+            label="Url"
             value={url}
-            data-testid='url'
             name="Url"
             placeholder="www.johnsmith.com"
-            onChange={({ target }) => setUrl(target.value)}
+            onChange={(event) => setUrl(event.target.value)}
           />
         </div>
-        <button type="submit" name="create">Create</button>
+        <Button type="submit" name="create">Create</Button>
       </form>
     </div>
   )
