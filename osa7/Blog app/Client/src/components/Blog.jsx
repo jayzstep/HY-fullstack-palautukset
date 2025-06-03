@@ -1,13 +1,23 @@
 import blogService from '../services/blogs'
-import { useQuery } from '@tanstack/react-query'
 import { useParams } from 'react-router-dom'
-
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import NewCommentForm from './NewCommentForm.jsx'
 const Blog = ({ user, handleLike, handleRemove }) => {
   const id = useParams().id
+
+  const queryClient = useQueryClient()
 
   const blogsQuery = useQuery({
     queryKey: ['blogs'],
     queryFn: blogService.getAll,
+  })
+
+  const addCommentMutation = useMutation({
+    mutationFn: (params) =>
+      blogService.addBlogComment(params.id, params.comment),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ querykey: ['blogs'] })
+    },
   })
 
   if (blogsQuery.isLoading) {
@@ -15,6 +25,9 @@ const Blog = ({ user, handleLike, handleRemove }) => {
   }
   const blog = blogsQuery.data.find((b) => b.id === id)
 
+  const handleNewComment = (comment) => {
+    addCommentMutation.mutate({ id: blog.id, comment })
+  }
 
   const updateLikes = (event) => {
     event.preventDefault()
@@ -40,6 +53,14 @@ const Blog = ({ user, handleLike, handleRemove }) => {
         <button onClick={removeBlog}>delete blog</button>
       )}
       <p>added by {blog.user.name}</p>
+      <h3>Comments</h3>
+      {blog.comments && (
+        blog.comments.map((c, index) => (
+          <p key={index}>{c}</p>
+        ))
+      )
+      }
+      <NewCommentForm handleNewComment={handleNewComment} />
     </div>
   )
 }
