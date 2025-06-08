@@ -1,3 +1,5 @@
 .DS_Store
 .DS_Store
 osa7/Blog app/Client/package-lock.json
+node_modules
+osa8/package-lock.json
