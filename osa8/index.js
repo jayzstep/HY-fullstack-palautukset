@@ -89,7 +89,7 @@ let books = [
 const typeDefs = `
 type Author {
 name: String!
-born: String
+born: Int
 id: ID!
 bookCount: Int!
 }
@@ -105,7 +105,7 @@ genres: [String!]!
 type Query {
 bookCount: Int!
 authorCount: Int!
-allBooks(author: String, genre: String!): [Book!]!
+allBooks(author: String, genre: String): [Book!]!
 allAuthors: [Author!]!
 }
 
@@ -116,6 +116,11 @@ published: Int!
 author: String!
 genres: [String!]!
 ): Book
+
+editAuthor(
+name: String!
+setBornTo: Int!
+): Author
 }
 `
 
@@ -142,12 +147,22 @@ const resolvers = {
   },
   Mutation: {
     addBook: (root, args) => {
-      const book = {...args, id: uuid()}
+      const book = { ...args, id: uuid() }
       books = books.concat(book)
       if (!authors.find(a => a.name === args.author)) {
-        authors = authors.concat({name: args.author, id: uuid()})
+        authors = authors.concat({ name: args.author, id: uuid() })
       }
       return book
+    },
+    editAuthor: (root, args) => {
+      const authorToUpdateIndex = authors.findIndex(a => a.name === args.name)
+      if (authorToUpdateIndex === -1) {
+        return null
+      }
+      const updatedAuthor = { ...authors[authorToUpdateIndex], born: args.setBornTo }
+      authors[authorToUpdateIndex] = updatedAuthor
+
+      return updatedAuthor
     }
   }
 }
