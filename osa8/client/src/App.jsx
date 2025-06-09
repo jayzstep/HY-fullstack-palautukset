@@ -4,22 +4,8 @@ import NewBook from './components/NewBook'
 import { gql, useQuery } from '@apollo/client'
 import { Routes, Route, Link } from 'react-router-dom'
 
-const ALL_AUTHORS = gql`
-  query {
-    allAuthors {
-      name
-      born
-      bookCount
-    }
-  }
-`
 
 const App = () => {
-  const result = useQuery(ALL_AUTHORS)
-
-  if (result.loading) {
-    return <div>loading...</div>
-  }
 
   return (
     <div>
@@ -36,10 +22,10 @@ const App = () => {
       </div>
 
       <Routes>
-        <Route path="/authors" element={<Authors authors={result.data.allAuthors} />} />
+        <Route path="/authors" element={<Authors />} />
         <Route path="/books" element={<Books />} />
         <Route path="/add" element={<NewBook />} />
-        <Route path="/" element={<Authors authors={result.data.allAuthors} />} />
+        <Route path="/" element={<Authors />} />
       </Routes>
     </div>
   )
