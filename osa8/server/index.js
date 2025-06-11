@@ -6,6 +6,7 @@ const mongoose = require('mongoose')
 mongoose.set('strictQuery', false)
 const Book = require('./models/book')
 const Author = require('./models/author')
+const { GraphQLError } = require('graphql')
 
 require('dotenv').config()
 
@@ -13,12 +14,12 @@ const MONGODB_URI = process.env.MONGODB_URI
 
 console.log('connecting to', MONGODB_URI)
 
-
-mongoose.connect(MONGODB_URI)
+mongoose
+  .connect(MONGODB_URI)
   .then(() => {
     console.log('connected to MongoDB')
   })
-  .catch((error) => {
+  .catch(error => {
     console.log('error connecting to MongoDB', error.message)
   })
 
@@ -151,11 +152,11 @@ const resolvers = {
     allBooks: async (root, args) => {
       const bookQuery = {}
       if (args.author) {
-        const author = await Author.findOne({name: args.author})
+        const author = await Author.findOne({ name: args.author })
         bookQuery.author = author._id
       }
       if (args.genre) {
-        bookQuery.genres = { $in: [args.genre]}
+        bookQuery.genres = { $in: [args.genre] }
       }
       return await Book.find(bookQuery).populate('author')
     },
@@ -163,22 +164,57 @@ const resolvers = {
   },
   Author: {
     bookCount: async root => {
-      return await Book.find({author: root._id}).countDocuments()
+      return await Book.find({ author: root._id }).countDocuments()
     }
   },
   Mutation: {
     addBook: async (root, args) => {
-      let author = await Author.findOne({ name: args.author})
-      console.log('authori on : ', author)
+      let author = await Author.findOne({ name: args.author })
       if (!author) {
         author = new Author({ name: args.author })
-        await author.save()
+        try {
+          await author.save()
+        } catch (error) {
+          throw new GraphQLError('Saving author failed', {
+            extensions: {
+              code: 'BAD_USER_INPUT',
+              invalidArgs: args.author,
+              error
+            }
+          })
+        }
       }
       const book = new Book({ ...args, author: author._id })
-      return book.save()
+      try {
+        return await book.save()
+      } catch (error) {
+        throw new GraphQLError('Saving a book failed', {
+          extensions: {
+            code: 'BAD_USER_INPUT',
+            invalidArgs: args.title,
+            error
+          }
+        })
+      }
     },
     editAuthor: async (root, args) => {
-      return await Author.findOneAndUpdate({name: args.name}, {born: args.setBornTo}, {new: true})
+      try {
+        return await Author.findOneAndUpdate(
+          { name: args.name },
+          {
+            born: args.setBornTo
+          },
+          { new: true }
+        )
+      } catch (error) {
+        throw new GraphQLError('Adding birthyear failed', {
+          extensions: {
+            code: 'BAD_USER_INPUT',
+            invalidArgs: args.name,
+            error
+          }
+        })
+      }
     }
   }
 }
