@@ -139,6 +139,7 @@ authorCount: Int!
 allBooks(author: String, genre: String): [Book!]!
 allAuthors: [Author!]!
 me: User
+allGenres: [String!]!
 }
 
 type Mutation {
@@ -171,6 +172,7 @@ const resolvers = {
     bookCount: async () => await Book.collection.countDocuments(),
     authorCount: async () => await Author.collection.countDocuments(),
     allBooks: async (root, args) => {
+      console.log('genre filter: ', args.genre)
       const bookQuery = {}
       if (args.author) {
         const author = await Author.findOne({ name: args.author })
@@ -179,11 +181,17 @@ const resolvers = {
       if (args.genre) {
         bookQuery.genres = { $in: [args.genre] }
       }
+      console.log('query object:', bookQuery)
       return await Book.find(bookQuery).populate('author')
     },
     allAuthors: async () => await Author.find({}),
     me: (root, args, context) => {
       return context.currentUser
+    },
+    allGenres: async (root, args) => {
+      const books = await Book.find({})
+      const genres = new Set(books.flatMap(book => book.genres))
+      return [...genres]
     }
   },
   Author: {
@@ -257,18 +265,20 @@ const resolvers = {
       }
     },
     createUser: async (root, args) => {
-      const user = new User({ username: args.username, favoriteGenre: args.favoriteGenre })
+      const user = new User({
+        username: args.username,
+        favoriteGenre: args.favoriteGenre
+      })
 
-      return user.save()
-        .catch(error => {
-          throw new GraphQLError('Creating the user failed', {
-            extensions: {
-              code: 'BAD_USER_INPUT',
-              invalidArgs: args.username,
-              error
-            }
-          })
+      return user.save().catch(error => {
+        throw new GraphQLError('Creating the user failed', {
+          extensions: {
+            code: 'BAD_USER_INPUT',
+            invalidArgs: args.username,
+            error
+          }
         })
+      })
     },
     login: async (root, args) => {
       const user = await User.findOne({ username: args.username })
