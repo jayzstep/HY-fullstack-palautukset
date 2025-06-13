@@ -172,7 +172,6 @@ const resolvers = {
     bookCount: async () => await Book.collection.countDocuments(),
     authorCount: async () => await Author.collection.countDocuments(),
     allBooks: async (root, args) => {
-      console.log('genre filter: ', args.genre)
       const bookQuery = {}
       if (args.author) {
         const author = await Author.findOne({ name: args.author })
@@ -181,7 +180,6 @@ const resolvers = {
       if (args.genre) {
         bookQuery.genres = { $in: [args.genre] }
       }
-      console.log('query object:', bookQuery)
       return await Book.find(bookQuery).populate('author')
     },
     allAuthors: async () => await Author.find({}),

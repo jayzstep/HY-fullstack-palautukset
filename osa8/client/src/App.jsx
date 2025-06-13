@@ -1,14 +1,16 @@
 import Authors from './components/Authors'
 import Books from './components/Books'
 import NewBook from './components/NewBook'
+import Recommendations from './components/Recommendations'
 import { Link, Route, Routes, useNavigate } from 'react-router-dom'
 import { useState } from 'react'
 import LoginForm from './components/LoginForm'
 import { useApolloClient } from '@apollo/client'
 
-
 const App = () => {
-  const [token, setToken] = useState(localStorage.getItem('booksAndAuthors-user-token'))
+  const [token, setToken] = useState(
+    localStorage.getItem('booksAndAuthors-user-token')
+  )
   const [showLogin, setShowLogin] = useState(false)
   const client = useApolloClient()
   const navigate = useNavigate()
@@ -34,6 +36,9 @@ const App = () => {
             <Link to="/add">
               <button>add book</button>
             </Link>
+            <Link to="/recommendations">
+              <button>recommendations</button>
+            </Link>
             <button onClick={logout}>logout</button>
           </>
         ) : (
@@ -44,10 +49,7 @@ const App = () => {
       {showLogin && !token && (
         <div>
           <h2>Login</h2>
-          <LoginForm 
-            setToken={setToken} 
-            onClose={() => setShowLogin(false)}
-          />
+          <LoginForm setToken={setToken} onClose={() => setShowLogin(false)} />
         </div>
       )}
 
@@ -55,6 +57,9 @@ const App = () => {
         <Route path="/authors" element={<Authors token={token} />} />
         <Route path="/books" element={<Books />} />
         {token && <Route path="/add" element={<NewBook />} />}
+        {token && (
+          <Route path="/recommendations" element={<Recommendations />} />
+        )}
         <Route path="/" element={<Authors token={token} />} />
       </Routes>
     </div>
