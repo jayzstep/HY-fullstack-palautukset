@@ -5,7 +5,8 @@ import Recommendations from './components/Recommendations'
 import { Link, Route, Routes, useNavigate } from 'react-router-dom'
 import { useState } from 'react'
 import LoginForm from './components/LoginForm'
-import { useApolloClient } from '@apollo/client'
+import { useApolloClient, useSubscription } from '@apollo/client'
+import { BOOK_ADDED } from './queries'
 
 const App = () => {
   const [token, setToken] = useState(
@@ -14,6 +15,12 @@ const App = () => {
   const [showLogin, setShowLogin] = useState(false)
   const client = useApolloClient()
   const navigate = useNavigate()
+
+  useSubscription(BOOK_ADDED, {
+    onData: ({ data }) => {
+      window.alert(`${data.data.bookAdded.title} was added`)
+    }
+  })
 
   const logout = () => {
     setToken(null)
