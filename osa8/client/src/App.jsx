@@ -6,7 +6,17 @@ import { Link, Route, Routes, useNavigate } from 'react-router-dom'
 import { useState } from 'react'
 import LoginForm from './components/LoginForm'
 import { useApolloClient, useSubscription } from '@apollo/client'
-import { BOOK_ADDED } from './queries'
+import { ALL_BOOKS, BOOK_ADDED } from './queries'
+
+export const updateCache = (cache, query, addedBook) => {
+  const uniqByTitle = a => {
+    let seen = new Set()
+    return a.filter(item => {
+      let k = item.title
+      return seen.has(k) ? false : seen.add(k)
+    })
+  }
+}
 
 const App = () => {
   const [token, setToken] = useState(
@@ -18,7 +28,11 @@ const App = () => {
 
   useSubscription(BOOK_ADDED, {
     onData: ({ data }) => {
-      window.alert(`${data.data.bookAdded.title} was added`)
+      const addedBook = data.data.bookAdded
+      window.alert(`${addedBook.title} was added`)
+      client.refetchQueries({
+        include: 'active'
+      })
     }
   })
 

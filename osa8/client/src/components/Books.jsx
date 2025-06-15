@@ -27,11 +27,9 @@ const Books = () => {
       <div>{genre && <div>in genre <b>{genre}</b></div>}</div>
       <div>
         {genres.map(genre => (
-          <>
-            <button key={genre} onClick={() => setGenre(genre)}>
-              {genre}
-            </button>
-          </>
+          <button key={genre} onClick={() => setGenre(genre)}>
+            {genre}
+          </button>
         ))}
         <button key="showall" onClick={() => setGenre(null)}>
           show all
